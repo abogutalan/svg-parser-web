@@ -77,6 +77,7 @@ let sharedLib = ffi.Library('parser/libsvgparse', {
 
 });
 
+/* file log table */
 app.get('/uploadedFiles', function(req, res) {
 
   var myStack = [];
@@ -114,10 +115,41 @@ app.get('/uploadedFiles', function(req, res) {
   }
 
   
-  console.log("The data being sent is : ");
-  console.log(myStack);
+  // console.log("The data being sent is : ");
+  // console.log(myStack);
 
   res.send(myStack);
+});
+
+/* svg view panel */
+app.get('/svgView', function(req, res){
+
+  let stack = [];
+  let path;
+  var fs = require('fs');
+  var files = fs.readdirSync("./uploads/");
+
+  for (var i in files) {
+
+    path = "./uploads/"+ files[i];
+
+    let svgViewJSON = {
+      fileName: files[i],
+      desc: "description",
+      title: "title",
+      paths: "paths",
+      rescts: "rects",
+      groups: "groups",
+      circles: "circles"
+    };
+    stack.push(svgViewJSON);
+  }
+
+  console.log("JSON to svg view panel is: ");
+  console.log(stack); 
+
+  res.send(stack);
+
 });
 
 //Sample endpoint

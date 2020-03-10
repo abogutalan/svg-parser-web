@@ -41,7 +41,7 @@ $(document).ready(function() {
             numGroups: "0"
         },
         success: function(data) { 
-            console.log("data size: "+data.length);                     
+            console.log("data size of file log table: "+data.length);                     
 
         for(let k = 0; k < data.length; k++){ 
 
@@ -114,9 +114,29 @@ $(document).ready(function() {
             circles: "circles"
         },
         success: function (data) {
+            console.log("data size of svg view panel: "+data.length);                     
+
+
+            var dropDownContent = document.getElementById("mySelect");
+
+            for (var i in data) {
+                var option = document.createElement("option");
+                option.value = data[i].fileName;
+                option.text = data[i].fileName;
+                dropDownContent.add(option);
+            }
 
             
+            document.getElementById('mySelect').addEventListener('change', update, true);
+            var result;
+            function update(dropDownList) {
+                
+                result = dropDownList.currentTarget.value;
+                console.log(result); 
 
+            }
+
+	        
         },
         fail: function(error) {
             console.log("ERROR in SVG view panel process!");

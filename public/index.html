@@ -38,6 +38,7 @@
         </div>
     </form>
 
+    <!-- File Log Table -->
     <h3>File log panel</h3>
     <div class="fileLog"> 
         <table id="fileLogTable">
@@ -54,12 +55,22 @@
      </div>
 
      <form id="uploadFile" method = "POST" action = "/upload" enctype="multipart/form-data">
-        <input type="file" id="uploadFile" name="uploadFile" accept=".svg" required>
+        <input type="file" id="upload-button" name="uploadFile" accept=".svg" required>
         <input type="submit" id="submitUploadFile" value="Upload file">
     </form>
 
     <p></p>
-        
+
+
+    <!-- Drop Down List -->   
+    <div class="dropdown">
+        <button class="dropbtn">Dropdown</button>
+        <select id="mySelect" class="dropdown-content">
+            <option value="None">-- Select --</option>
+        </select>
+      </div>
+
+    <!-- SVG View Panel --> 
     <div class="svgView">
         <a id="svgHref" href="rects.svg">rects.svg</a>
     <table id="svgViewPanel">

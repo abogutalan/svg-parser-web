@@ -71,14 +71,22 @@ app.get('/uploads/:name', function(req , res){
 
 //******************** Your code goes here ******************** 
 
-let sharedLib = ffi.Library('parser/libsvgparse', {
+let sharedLib = ffi.Library('parser/bin/libsvgparse', {
       'createValidSVGimage': [ 'pointer', [ 'string', 'string' ] ],
       'SVGtoJSON': [ 'string', [ 'pointer' ] ],
+      'getSVGTitle': [ 'string', [ 'pointer' ] ],
+      'getSVGDescription': [ 'string', [ 'pointer' ] ],
+      'mySVGToRectJSON': [ 'string', [ 'pointer' ] ],
+      'mySVGToCircJSON': [ 'string', [ 'pointer' ] ],
+      'mySVGToPathJSON': [ 'string', [ 'pointer' ] ],
+      'mySVGToGroupJSON': [ 'string', [ 'pointer' ] ],
+      
 
 });
 
 /* file log table */
 app.get('/uploadedFiles', function(req, res) {
+
 
   var myStack = [];
   let path;
@@ -124,6 +132,12 @@ app.get('/uploadedFiles', function(req, res) {
 /* svg view panel */
 app.get('/svgView', function(req, res){
 
+  // var fN = req.query.fileName;  // -> getting file name from index.js
+  // console.log("++++file name :::: "+fN);
+
+  
+
+
   let stack = [];
   let path;
   var fs = require('fs');
@@ -133,20 +147,38 @@ app.get('/svgView', function(req, res){
 
     path = "./uploads/"+ files[i];
 
+    var panelSVGimage = sharedLib.createValidSVGimage(path, "parser/validation/svg.xsd");
+
+    var svgTitle = sharedLib.getSVGTitle(panelSVGimage);
+    var svgDesc = sharedLib.getSVGDescription(panelSVGimage);
+
+    let rects = sharedLib.mySVGToRectJSON(panelSVGimage);
+    let circles = sharedLib.mySVGToCircJSON(panelSVGimage);
+    let paths = sharedLib.mySVGToPathJSON(panelSVGimage);
+    let groups = sharedLib.mySVGToGroupJSON(panelSVGimage);
+
+    rects = JSON.parse(rects);
+    console.log(rects);
+
+    circles = JSON.parse(circles);
+    paths = JSON.parse(paths);
+    groups = JSON.parse(groups);
+
+
     let svgViewJSON = {
       fileName: files[i],
-      desc: "description",
-      title: "title",
-      paths: "paths",
-      rescts: "rects",
-      groups: "groups",
-      circles: "circles"
+      desc: svgDesc.toString(),
+      title: svgTitle.toString(),
+      rects: rects,
+      circles: circles,
+      paths: paths,
+      groups: groups
     };
     stack.push(svgViewJSON);
   }
 
   console.log("JSON to svg view panel is: ");
-  console.log(stack); 
+ // console.log(stack); 
 
   res.send(stack);
 

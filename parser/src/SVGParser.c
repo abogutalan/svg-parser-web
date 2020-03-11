@@ -2572,3 +2572,46 @@ char * mySVGtoJSON(char * filename) {
     return str;
 }
 
+char * getSVGTitle(SVGimage * img) {
+	
+	char * title = malloc(sizeof(char) * 257);
+	strcpy(title, img->title);
+
+	return title;
+
+}
+
+char * getSVGDescription(SVGimage * img) {
+	
+	char * desc = malloc(sizeof(char) * 257);
+	strcpy(desc, img->description);
+
+	return desc;
+
+}
+
+char * mySVGToRectJSON(SVGimage * img) {
+
+    char * jstring = rectListToJSON(img->rectangles);
+
+    return jstring;
+}
+char * mySVGToCircJSON(SVGimage * img) {
+
+    char * jstring = circListToJSON(img->circles);
+
+    return jstring;
+}
+char * mySVGToPathJSON(SVGimage * img) {
+
+    char * jstring = pathListToJSON(img->paths);
+
+    return jstring;
+}
+char * mySVGToGroupJSON(SVGimage * img) {
+
+    char * jstring = groupListToJSON(img->groups);
+
+    return jstring;
+}
+

@@ -86,9 +86,11 @@ p {
 
 .svgView {
     height: 70%;
+    width: 90%;
     overflow: scroll;
     padding: 0.7%;
     border: 2px solid black;
+    
 }
 figure {
     border: 1px solid #000;
@@ -97,13 +99,11 @@ figure {
 
 /* image at the top of svg view panel */
 .logo {
-    background-repeat: no-repeat;
     display: block;
-    margin-left: auto;
-    margin-right: auto;
-    width: 30%;
-    position: relative;
-    text-indent: -999999px;
+  margin-left: auto;
+  margin-right: auto;
+  width: 80%;
+
 }
 .firstLine {
     width: 50%;
@@ -111,6 +111,9 @@ figure {
 .secondLine {
     width: 50%;
 }
+.democlass {
+    color: red;
+  }
 @media(max-width: 900px) {
     html {
         font-size: 14px !important;

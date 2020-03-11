@@ -41,7 +41,9 @@ $(document).ready(function() {
             numGroups: "0"
         },
         success: function(data) { 
-            console.log("data size of file log table: "+data.length);                     
+            console.log("data size of file log table: "+data.length);      
+            
+            //$("#tableID").append("<tr>" data "")
 
         for(let k = 0; k < data.length; k++){ 
 
@@ -66,6 +68,7 @@ $(document).ready(function() {
                     let linkText = document.createTextNode(data[k].fileName);
                     link.appendChild(linkText);
                     link.href = data[k].fileName;
+                    link.download;
                     cell1.appendChild(link);
                 }
                 else if(i == 2) {
@@ -108,10 +111,10 @@ $(document).ready(function() {
             fileName: "rects.svg",
             desc: "description",
             title: "title",
+            rects: "rects",
+            circles: "circles",
             paths: "paths",
-            rescts: "rects",
-            groups: "groups",
-            circles: "circles"
+            groups: "groups"
         },
         success: function (data) {
             console.log("data size of svg view panel: "+data.length);                     
@@ -128,13 +131,23 @@ $(document).ready(function() {
 
             
             document.getElementById('mySelect').addEventListener('change', update, true);
-            var result;
+            var curVal;
             function update(dropDownList) {
                 
-                result = dropDownList.currentTarget.value;
-                console.log(result); 
+                curVal = dropDownList.currentTarget.value;
+                console.log("selected item : "+curVal); 
+
+                for ( var j in data ) {
+    
+                    if(data[j].fileName == curVal) {
+                        console.log("item being populated: ", curVal);
+                        populateSvgViewPanel(data[j]);
+                    }
+                }              
 
             }
+
+            
 
 	        
         },
@@ -143,6 +156,157 @@ $(document).ready(function() {
             console.log(error);
         }
     });
+
+    function populateSvgViewPanel(data) {
+        console.log("to test: "+ data.fileName);
+        let imgPath = "./uploads/" + data.fileName;
+    
+        /* Get the main table. */
+        var svgPanel = document.getElementById("svgViewPanel");
+        svgPanel.className = 'svgView';
+    
+        /* Creates a new dynamic table */
+        let table = document.createElement('table');
+        table.id = 'svgViewerTable';
+        table.className = 'svgViewer';
+        
+        let tableHead = table.createTHead();
+        
+        /* Creates the rows for the table headers. */
+        let tr1 = document.createElement('tr');
+        let tr2 = document.createElement('tr');
+        let tr3 = document.createElement('tr');
+    
+        /* Creates the headers for the table */
+        let imageTitle = document.createElement('th');
+        
+        let panelTitle = document.createElement('th');
+        let panelDescription = document.createElement('th');
+        
+        let panelComponent = document.createElement('th');
+        let panelSummary = document.createElement('th');
+        let panelOtherAttr = document.createElement('th');
+    
+        /* Creates the text for table heads */
+        let imageHead = document.createTextNode('Image View');
+        
+        let titleHead = document.createTextNode('Title');
+        let descriptionHead = document.createTextNode('Description');
+    
+        let componentHead = document.createTextNode('Component');
+        let summaryHead = document.createTextNode('Summary');
+        let othrAttrHead = document.createTextNode('Other Attributes');
+        
+        
+        /* Adds the header texts to headers. */
+        imageTitle.appendChild(imageHead);
+        
+        panelTitle.appendChild(titleHead);
+        panelDescription.appendChild(descriptionHead);
+        
+        panelComponent.appendChild(componentHead);
+        panelSummary.appendChild(summaryHead);
+        panelOtherAttr.appendChild(othrAttrHead);
+    
+    
+        /* Adds the headers to header rows */
+        tr1.appendChild(imageTitle);
+        
+        tr2.appendChild(panelTitle);
+        tr2.appendChild(panelDescription);
+        
+        tr3.appendChild(panelComponent);
+        tr3.appendChild(panelSummary);
+        tr3.appendChild(panelOtherAttr);
+        
+        /* Adds the head rows to table head */
+        tableHead.appendChild(tr1);
+        tableHead.appendChild(tr2);
+        tableHead.appendChild(tr3);
+        
+        /* Adds the table head to the table */
+        table.appendChild(tableHead);
+        
+        /* Hides the default table */
+        let defaultTable = document.getElementById("defaultTable")
+        defaultTable.style.visibility = "hidden"
+        
+        /* Replaces the child of the main table with the new dynamic table created. Adds it if none exist. */
+        svgPanel.replaceChild(table, svgPanel.childNodes[0]);
+        
+        /* Populates the table added with the json data provided */     
+        console.log("Row lenght is : " + table.rows.length);
+    
+    
+        let row1 = table.insertRow(table.rows.length-2);
+        let row2 = table.insertRow(table.rows.length-1);
+        
+    
+        let imgCell = row1.insertCell(0);
+        
+        let titleCell = row2.insertCell(0);
+        let descCell = row2.insertCell(1);
+    
+        var img = document.createElement('img');
+        img.src = imgPath;
+        img.height = 200;
+        img.width = 200;
+        img.className = 'logo';
+        imgCell.appendChild(img);
+    
+    
+        /* panel title */
+        let titleElement = document.createElement('p');
+        let titleText = document.createTextNode(data.title);
+        titleElement.appendChild(titleText);
+        titleCell.appendChild(titleElement);
+    
+        /* panel description */
+        let descElement = document.createElement('p');
+        let descText = document.createTextNode(data.desc);
+        descElement.appendChild(descText);
+        descCell.appendChild(descElement);
+
+        addRects(table, data);
+        // addCircles(table, data);   
+        // addPaths(table, data);
+        // addGroups(table, data);
+
+       
+        
+    }
+
+    function addRects(table, data) {
+
+        for ( var i in data.rects) {
+            var row = table.insertRow(table.rows.length);
+
+        /* component */
+            let firstColumn = row.insertCell(0);
+            let firstElement = document.createElement('p');
+            let firstText = document.createTextNode("Rectangle " + (i));
+            firstElement.appendChild(firstText);
+            firstColumn.appendChild(firstElement);
+        /* summary */
+            let secondCell =  row.insertCell(1);
+            let secondElement = document.createElement('p');
+            let secondText = document.createTextNode("Upper left corner: x= " + data.rects[i].x + data.rects[i].units+ 
+            "  y= " + data.rects[i].y + data.rects[i].units + "   width: " + data.rects[i].w + "  height: " + data.rects[i].h);
+            secondElement.appendChild(secondText);
+            secondCell.appendChild(secondElement);
+        /* other attribute */
+            let thirdCell = row.insertCell(2);
+            let thirdElement = document.createElement('p');
+            let thirdText = document.createTextNode(data.rects[i].numAttr);
+            thirdElement.appendChild(thirdText);
+            thirdCell.appendChild(thirdElement);
+
+            
+        }
+    
+       
+        
+    }
 
 
     // Event listener form example , we can use this instead explicitly listening for events

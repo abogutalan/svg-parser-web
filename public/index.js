@@ -110,7 +110,7 @@ $(document).ready(function() {
         dataType: 'json',
         url: '/svgView',
         data: {
-            fileName: "rects.svg",
+            fileName: "",
             desc: "description",
             title: "title",
             rects: "rects",
@@ -147,14 +147,57 @@ $(document).ready(function() {
                     }
                 }              
 
-            }
-
-            
+            }         
 
 	        
         },
         fail: function(error) {
             console.log("ERROR in SVG view panel process!");
+            console.log(error);
+        }
+    });
+
+    // Showing other attributes
+    $.ajax({
+        type: 'get',            //Request type
+        dataType: 'json',       //Data type - we will use JSON for almost everything 
+        url: '/showOtherAttr',   //The server endpoint we are connecting to
+        data: {
+            fileName: "",
+            otherAttrOfRects: "",
+            otherAttrOfCircs: "",
+            otherAttrOfPaths: "",
+            otherAttrOfGroups: ""
+        },
+        success: function (data) {
+            console.log("data has been taken");
+
+            for(let k = 0; k < data.length; k++){ 
+
+                var table=document.getElementById("otherAttrTable");
+               
+            console.log("first loop");
+
+                
+                for ( var i in data[k].otherAttrOfCircs) {
+                    var row = table.insertRow(table.rows.length);
+
+                    // to do : don't forget to put them in order ie. rect, circle, path , group
+
+                    /* other attributes of circles */
+                    let cellAttr = row.insertCell(0);
+                    cellAttr.innerHTML="Other Attributes of " + data[k].fileName + " ==> { name: " + data[k].otherAttrOfCircs[i][0].name + ", value: " + data[k].otherAttrOfCircs[i][0].value + " } ";
+        
+            console.log("seond loop");
+
+                }
+                    
+                // let cellAttr = row.insertCell(0);
+                // cellAttr.innerHTML=data[k].otherAttrOfCircs;
+            }
+        },      
+        fail: function(error) {
+            console.log("ERROR in other Attributes Table!");
             console.log(error);
         }
     });

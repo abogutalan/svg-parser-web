@@ -2670,3 +2670,44 @@ char * showRectAttributes(SVGimage * img) {
 
 }
 
+char * showCircAttributes(SVGimage * img) {
+
+    int len = 500; 
+    char * attrListJSON = (char*)malloc(sizeof(char)*len);
+
+    strcpy(attrListJSON, "[");
+
+
+    ListIterator iterator, tmpIter;
+    void * tmp;
+    iterator = createIterator(img->circles);
+    tmp = nextElement(&iterator);
+    while (tmp != NULL) {
+        Circle * tmpCirc = (Circle *)tmp;
+
+        
+        char * tmpStr = attrListToJSON(tmpCirc->otherAttributes);
+
+        tmpIter = iterator;
+        if (nextElement(&tmpIter) == NULL)
+        {
+            strcat(attrListJSON, tmpStr);
+        }
+        else
+        {
+            strcat(attrListJSON, strcat(tmpStr, ","));
+        }
+
+        free(tmpStr);
+        
+                   
+    tmp = nextElement(&iterator);
+    }
+    strcat(attrListJSON, "]");
+
+
+    return attrListJSON;
+
+}
+
+

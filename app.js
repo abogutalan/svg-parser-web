@@ -81,6 +81,7 @@ let sharedLib = ffi.Library('./libsvgparse', {
       'mySVGToPathJSON': [ 'string', [ 'pointer' ] ],
       'mySVGToGroupJSON': [ 'string', [ 'pointer' ] ],
       'showRectAttributes': [ 'string', [ 'pointer' ] ],      
+      'showCircAttributes': [ 'string', [ 'pointer' ] ]      
 
 });
 
@@ -134,15 +135,46 @@ app.get('/uploadedFiles', function(req, res) {
   res.send(myStack);
 });
 
+/* show attributes table */                                 // to do : check validation of svg
+app.get('/showOtherAttr', function(req, res) {
+
+  let stack = [];
+  let path;
+  var fs = require('fs');
+  var files = fs.readdirSync("./uploads/");
+
+  for (var i in files) {
+
+    path = "./uploads/"+ files[i];
+
+    let showAttrSVGimage = sharedLib.createValidSVGimage(path, "parser/validation/svg.xsd");
+
+    let rectAttr = sharedLib.showRectAttributes(showAttrSVGimage);
+    let circleAttr = sharedLib.showCircAttributes(showAttrSVGimage);
+  
+    rectAttr = JSON.parse(rectAttr);
+    circleAttr = JSON.parse(circleAttr);
+    console.log(circleAttr);
+
+
+    let showAttrJSON = {
+      fileName: files[i],
+      otherAttrOfRects : rectAttr,
+      otherAttrOfCircs : circleAttr 
+    };
+    stack.push(showAttrJSON);
+  }
+  console.log("show attribute json array is: ");
+ // console.log(stack); 
+
+  res.send(stack);
+});
+
+
 /* svg view panel */
 app.get('/svgView', function(req, res){
-
   // var fN = req.query.fileName;  // -> getting file name from index.js
   // console.log("++++file name :::: "+fN);
-
-  
-
-
   let stack = [];
   let path;
   var fs = require('fs');
@@ -155,30 +187,29 @@ app.get('/svgView', function(req, res){
     var panelSVGimage = sharedLib.createValidSVGimage(path, "parser/validation/svg.xsd");
 
     var svgTitle = sharedLib.getSVGTitle(panelSVGimage);
-    console.log(svgTitle);
 
     /* if it is a valid SVG */
     if ( svgTitle != "Invalid SVG!") {
       var svgDesc = sharedLib.getSVGDescription(panelSVGimage);
 
 
-      let rects = sharedLib.mySVGToRectJSON(panelSVGimage);
-      
+      let rects = sharedLib.mySVGToRectJSON(panelSVGimage);      
       let circles = sharedLib.mySVGToCircJSON(panelSVGimage);
+      /*
+        finish the c functions for paths and groups in SVG parser.c
+        pass finished json to the front end
+        only other attributes of cirlces finished at the front end
+        if it works for all valid SVGs, try them with INVALID SVG images
+      */
       let paths = sharedLib.mySVGToPathJSON(panelSVGimage);
       let groups = sharedLib.mySVGToGroupJSON(panelSVGimage);
-  
-      let rectAttrStr = sharedLib.showRectAttributes(panelSVGimage);
-      rectAttrStr = JSON.parse(rectAttrStr);
-  
-     // console.log(rectAttrStr);
   
       
   
       rects = JSON.parse(rects);
       circles = JSON.parse(circles);
       paths = JSON.parse(paths);
-      groups = JSON.parse(groups);
+      groups = JSON.parse(groups);      
   
   
       let svgViewJSON = {

@@ -2290,9 +2290,10 @@ char* attrListToJSON(const List *list){
         tmp = nextElement(&iterator);
         }
 
+        strcat(attrListJSON, "]");
         
     }
-    strcat(attrListJSON, "]");
+    
 
     return attrListJSON;
 }
@@ -2340,9 +2341,10 @@ char* circListToJSON(const List *list){
         tmp = nextElement(&iterator);
         }
 
-        
+        strcat(circleListJSON, "]");
+
     }
-    strcat(circleListJSON, "]");
+    
 
     return circleListJSON;
 }
@@ -2390,9 +2392,10 @@ char* rectListToJSON(const List *list){
         tmp = nextElement(&iterator);
         }
 
-        
+        strcat(rectListJSON, "]");
+
     }
-    strcat(rectListJSON, "]");
+    
 
     return rectListJSON;
 }
@@ -2442,9 +2445,9 @@ char* pathListToJSON(const List *list){
         tmp = nextElement(&iterator);
         }
 
-        
+        strcat(pathListJSON, "]");        
     }
-    strcat(pathListJSON, "]");
+    
 
     return pathListJSON;
 }
@@ -2492,10 +2495,9 @@ char* groupListToJSON(const List *list){
         tmp = nextElement(&iterator);
         }
 
-        
+        strcat(groupListJSON, "]");        
     }
-    strcat(groupListJSON, "]");
-
+   
     return groupListJSON;
 }
 
@@ -2615,7 +2617,43 @@ char * mySVGToGroupJSON(SVGimage * img) {
     return jstring;
 }
 
-// char * SVGtoAttrListJSON(SVGimage * img) {
-    
-// }
+char * showRectAttributes(SVGimage * img) {
+
+    int len = 500; 
+    char * attrListJSON = (char*)malloc(sizeof(char)*len);
+
+    strcpy(attrListJSON, "[");
+
+
+    ListIterator iterator, tmpIter;
+    void * tmp;
+    iterator = createIterator(img->rectangles);
+    tmp = nextElement(&iterator);
+    while (tmp != NULL) {
+        Rectangle * tmpRect = (Rectangle *)tmp;
+
+        
+        char * tmpStr = attrListToJSON(tmpRect->otherAttributes);
+
+        tmpIter = iterator;
+        if (nextElement(&tmpIter) == NULL)
+        {
+            strcat(attrListJSON, tmpStr);
+        }
+        else
+        {
+            strcat(attrListJSON, strcat(tmpStr, ","));
+        }
+
+        free(tmpStr);
+        
+                   
+    tmp = nextElement(&iterator);
+    }
+    strcat(attrListJSON, "]");
+
+
+    return attrListJSON;
+
+}
 

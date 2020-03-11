@@ -399,6 +399,7 @@ char * mySVGToRectJSON(SVGimage * img);
 char * mySVGToCircJSON(SVGimage * img);
 char * mySVGToPathJSON(SVGimage * img);
 char * mySVGToGroupJSON(SVGimage * img);
+char * showRectAttributes(SVGimage * img);
 
 
 /* ******************************* List helper functions  - MUST be implemented *************************** */

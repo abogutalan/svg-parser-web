@@ -158,7 +158,6 @@ $(document).ready(function() {
     });
 
     function populateSvgViewPanel(data) {
-        console.log("to test: "+ data.fileName);
         let imgPath = "./uploads/" + data.fileName;
     
         /* Getting svg view panel */
@@ -188,8 +187,10 @@ $(document).ready(function() {
         let panelOtherAttr = document.createElement('th');
     
         /* Creating text of sections */
-        let imageView = document.createTextNode('Image View');      // to do : file name
-        
+        let imageView = document.createElement('a');
+        imageView.innerHTML = data.fileName;
+        imageView.href = data.fileName;
+
         let titleSection = document.createTextNode('Title');
         let descriptionHead = document.createTextNode('Description');
     
@@ -234,9 +235,8 @@ $(document).ready(function() {
         /* Replacing child of panel with a new dynamic panel created. Adding it only if none exist. */
         svgPanel.replaceChild(table, svgPanel.childNodes[0]);
         
-        /* Populating added svg view panel with the json data provided */     
-        console.log("Row lenght is : " + table.rows.length);
-    
+        
+        /* Populating added svg view panel with the json data provided */       
     
         let row1 = table.insertRow(table.rows.length-2);
         let row2 = table.insertRow(table.rows.length-1);

@@ -2509,6 +2509,9 @@ char* groupListToJSON(const List *list){
 **/
 char* SVGtoJSON(const SVGimage* imge){
 
+    int ret = validateSVGimage((SVGimage*)imge, "parser/validation/svg.xsd");
+	if (ret==0) return "invalid SVG";
+
     char * svgJSON = NULL;
 
     if ( imge == NULL ) {
@@ -2577,7 +2580,9 @@ char * mySVGtoJSON(char * filename) {
 char * getSVGTitle(SVGimage * img) {
 	
 	char * title = malloc(sizeof(char) * 257);
-	strcpy(title, img->title);
+    int ret = validateSVGimage(img, "parser/validation/svg.xsd");
+	if (ret==1) strcpy(title, img->title);
+    else strcpy(title, "Invalid SVG!");
 
 	return title;
 
@@ -2586,7 +2591,10 @@ char * getSVGTitle(SVGimage * img) {
 char * getSVGDescription(SVGimage * img) {
 	
 	char * desc = malloc(sizeof(char) * 257);
-	strcpy(desc, img->description);
+    int ret = validateSVGimage(img, "parser/validation/svg.xsd");
+	if (ret==1) strcpy(desc, img->description);
+    else strcpy(desc, "description of Invalid SVG!");
+	
 
 	return desc;
 
@@ -2594,27 +2602,32 @@ char * getSVGDescription(SVGimage * img) {
 
 char * mySVGToRectJSON(SVGimage * img) {
 
-    char * jstring = rectListToJSON(img->rectangles);
+    int ret = validateSVGimage(img, "parser/validation/svg.xsd");
+	if (ret==1) return rectListToJSON(img->rectangles);
+    else return "rect json of invalid SVG !";
+    
 
-    return jstring;
 }
 char * mySVGToCircJSON(SVGimage * img) {
 
-    char * jstring = circListToJSON(img->circles);
+    int ret = validateSVGimage(img, "parser/validation/svg.xsd");
+	if (ret==1) return circListToJSON(img->circles);
+    else return "circle json of invalid SVG !";
 
-    return jstring;
 }
 char * mySVGToPathJSON(SVGimage * img) {
 
-    char * jstring = pathListToJSON(img->paths);
+    int ret = validateSVGimage(img, "parser/validation/svg.xsd");
+	if (ret==1) return pathListToJSON(img->paths);
+    else return "path json of invalid SVG !";
 
-    return jstring;
+
 }
 char * mySVGToGroupJSON(SVGimage * img) {
 
-    char * jstring = groupListToJSON(img->groups);
-
-    return jstring;
+    int ret = validateSVGimage(img, "parser/validation/svg.xsd");
+	if (ret==1) return groupListToJSON(img->groups);
+    else return "group json of invalid SVG !";
 }
 
 char * showRectAttributes(SVGimage * img) {

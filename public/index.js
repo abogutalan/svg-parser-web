@@ -161,23 +161,23 @@ $(document).ready(function() {
         console.log("to test: "+ data.fileName);
         let imgPath = "./uploads/" + data.fileName;
     
-        /* Get the main table. */
+        /* Getting svg view panel */
         var svgPanel = document.getElementById("svgViewPanel");
         svgPanel.className = 'svgView';
     
-        /* Creates a new dynamic table */
+        /* Creating svg view panel */
         let table = document.createElement('table');
         table.id = 'svgViewerTable';
         table.className = 'svgViewer';
         
         let tableHead = table.createTHead();
         
-        /* Creates the rows for the table headers. */
-        let tr1 = document.createElement('tr');
-        let tr2 = document.createElement('tr');
-        let tr3 = document.createElement('tr');
+        /* Creating rows of the panel. */
+        let tr_fileName = document.createElement('tr');
+        let tr_firstRow = document.createElement('tr');
+        let tr_secondRow = document.createElement('tr');
     
-        /* Creates the headers for the table */
+        /* Creating section names of the panel */
         let imageTitle = document.createElement('th');
         
         let panelTitle = document.createElement('th');
@@ -187,54 +187,54 @@ $(document).ready(function() {
         let panelSummary = document.createElement('th');
         let panelOtherAttr = document.createElement('th');
     
-        /* Creates the text for table heads */
-        let imageHead = document.createTextNode('Image View');
+        /* Creating text of sections */
+        let imageView = document.createTextNode('Image View');      // to do : file name
         
-        let titleHead = document.createTextNode('Title');
+        let titleSection = document.createTextNode('Title');
         let descriptionHead = document.createTextNode('Description');
     
-        let componentHead = document.createTextNode('Component');
-        let summaryHead = document.createTextNode('Summary');
-        let othrAttrHead = document.createTextNode('Other Attributes');
+        let componentSection = document.createTextNode('Component');
+        let summarySection = document.createTextNode('Summary');
+        let otherAttrSection = document.createTextNode('Other Attributes');
         
         
-        /* Adds the header texts to headers. */
-        imageTitle.appendChild(imageHead);
+        /* setting section names */
+        imageTitle.appendChild(imageView);
         
-        panelTitle.appendChild(titleHead);
+        panelTitle.appendChild(titleSection);
         panelDescription.appendChild(descriptionHead);
         
-        panelComponent.appendChild(componentHead);
-        panelSummary.appendChild(summaryHead);
-        panelOtherAttr.appendChild(othrAttrHead);
+        panelComponent.appendChild(componentSection);
+        panelSummary.appendChild(summarySection);
+        panelOtherAttr.appendChild(otherAttrSection);
     
     
-        /* Adds the headers to header rows */
-        tr1.appendChild(imageTitle);
+        /* Setting sections to rows */
+        tr_fileName.appendChild(imageTitle);
         
-        tr2.appendChild(panelTitle);
-        tr2.appendChild(panelDescription);
+        tr_firstRow.appendChild(panelTitle);
+        tr_firstRow.appendChild(panelDescription);
         
-        tr3.appendChild(panelComponent);
-        tr3.appendChild(panelSummary);
-        tr3.appendChild(panelOtherAttr);
+        tr_secondRow.appendChild(panelComponent);
+        tr_secondRow.appendChild(panelSummary);
+        tr_secondRow.appendChild(panelOtherAttr);
         
-        /* Adds the head rows to table head */
-        tableHead.appendChild(tr1);
-        tableHead.appendChild(tr2);
-        tableHead.appendChild(tr3);
+        /* Setting rows to the table head */
+        tableHead.appendChild(tr_fileName);
+        tableHead.appendChild(tr_firstRow);
+        tableHead.appendChild(tr_secondRow);
         
-        /* Adds the table head to the table */
+        /* Appending to the panel */
         table.appendChild(tableHead);
         
-        /* Hides the default table */
+        /* Hiding default table */
         let defaultTable = document.getElementById("defaultTable")
         defaultTable.style.visibility = "hidden"
         
-        /* Replaces the child of the main table with the new dynamic table created. Adds it if none exist. */
+        /* Replacing child of panel with a new dynamic panel created. Adding it only if none exist. */
         svgPanel.replaceChild(table, svgPanel.childNodes[0]);
         
-        /* Populates the table added with the json data provided */     
+        /* Populating added svg view panel with the json data provided */     
         console.log("Row lenght is : " + table.rows.length);
     
     
@@ -268,9 +268,9 @@ $(document).ready(function() {
         descCell.appendChild(descElement);
 
         addRects(table, data);
-        // addCircles(table, data);   
-        // addPaths(table, data);
-        // addGroups(table, data);
+        addCircles(table, data);   
+        addPaths(table, data);
+        addGroups(table, data);
 
        
         
@@ -284,7 +284,7 @@ $(document).ready(function() {
         /* component */
             let firstColumn = row.insertCell(0);
             let firstElement = document.createElement('p');
-            let firstText = document.createTextNode("Rectangle " + (i));
+            let firstText = document.createTextNode("Rectangle " + (+i + 1));
             firstElement.appendChild(firstText);
             firstColumn.appendChild(firstElement);
         /* summary */
@@ -300,12 +300,90 @@ $(document).ready(function() {
             let thirdText = document.createTextNode(data.rects[i].numAttr);
             thirdElement.appendChild(thirdText);
             thirdCell.appendChild(thirdElement);
-
             
-        }
-    
-       
-        
+        }        
+    }
+
+    function addCircles(table, data) {
+
+        for ( var i in data.circles) {
+            var row = table.insertRow(table.rows.length);
+
+        /* component */
+            let firstColumn = row.insertCell(0);
+            let firstElement = document.createElement('p');
+            let firstText = document.createTextNode("Circle " + (+i + 1));
+            firstElement.appendChild(firstText);
+            firstColumn.appendChild(firstElement);
+        /* summary */
+            let secondCell =  row.insertCell(1);
+            let secondElement = document.createElement('p');
+            let secondText = document.createTextNode("Centre: x = " + data.circles[i].cx + data.circles[i].units+ 
+            ", y = " + data.circles[i].cy + data.circles[i].units + ", radius = " + data.circles[i].r + data.circles[i].units);
+            secondElement.appendChild(secondText);
+            secondCell.appendChild(secondElement);
+        /* other attribute */
+            let thirdCell = row.insertCell(2);
+            let thirdElement = document.createElement('p');
+            let thirdText = document.createTextNode(data.circles[i].numAttr);
+            thirdElement.appendChild(thirdText);
+            thirdCell.appendChild(thirdElement);
+            
+        }        
+    }
+
+    function addPaths(table, data) {
+
+        for ( var i in data.paths) {
+            var row = table.insertRow(table.rows.length);
+
+        /* component */
+            let firstColumn = row.insertCell(0);
+            let firstElement = document.createElement('p');
+            let firstText = document.createTextNode("Path " + (+i + 1));
+            firstElement.appendChild(firstText);
+            firstColumn.appendChild(firstElement);
+        /* summary */
+            let secondCell =  row.insertCell(1);
+            let secondElement = document.createElement('p');
+            let secondText = document.createTextNode("path data = " + data.paths[i].d );
+            secondElement.appendChild(secondText);
+            secondCell.appendChild(secondElement);
+        /* other attribute */
+            let thirdCell = row.insertCell(2);
+            let thirdElement = document.createElement('p');
+            let thirdText = document.createTextNode(data.paths[i].numAttr);
+            thirdElement.appendChild(thirdText);
+            thirdCell.appendChild(thirdElement);
+            
+        }        
+    }
+
+    function addGroups(table, data) {
+
+        for ( var i in data.groups) {
+            var row = table.insertRow(table.rows.length);
+
+        /* component */
+            let firstColumn = row.insertCell(0);
+            let firstElement = document.createElement('p');
+            let firstText = document.createTextNode("Group " + (+i + 1));
+            firstElement.appendChild(firstText);
+            firstColumn.appendChild(firstElement);
+        /* summary */
+            let secondCell =  row.insertCell(1);
+            let secondElement = document.createElement('p');
+            let secondText = document.createTextNode(data.groups[i].children + " child elements" );
+            secondElement.appendChild(secondText);
+            secondCell.appendChild(secondElement);
+        /* other attribute */
+            let thirdCell = row.insertCell(2);
+            let thirdElement = document.createElement('p');
+            let thirdText = document.createTextNode(data.groups[i].numAttr);
+            thirdElement.appendChild(thirdText);
+            thirdCell.appendChild(thirdElement);
+            
+        }        
     }
 
 

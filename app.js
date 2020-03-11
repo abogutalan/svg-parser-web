@@ -158,8 +158,6 @@ app.get('/svgView', function(req, res){
     let groups = sharedLib.mySVGToGroupJSON(panelSVGimage);
 
     rects = JSON.parse(rects);
-    console.log(rects);
-
     circles = JSON.parse(circles);
     paths = JSON.parse(paths);
     groups = JSON.parse(groups);

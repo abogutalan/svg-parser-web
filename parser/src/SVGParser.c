@@ -2204,7 +2204,7 @@ char* pathToJSON(const Path *p){
         else attr = 0;
 
 
-        sprintf(pathJSON, "{\"d\":\"%s\",\"numAttr\":%d}", p->data, attr);
+        sprintf(pathJSON, "{\"d\":\"%s\",\"numAttr\":%d}", string, attr);
     }
     return pathJSON;
 }
@@ -2614,4 +2614,8 @@ char * mySVGToGroupJSON(SVGimage * img) {
 
     return jstring;
 }
+
+// char * SVGtoAttrListJSON(SVGimage * img) {
+    
+// }
 

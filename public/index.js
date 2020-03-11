@@ -33,7 +33,7 @@ $(document).ready(function() {
         dataType: 'json',
         url: '/uploadedFiles',
         data: {
-            fileName: "rects.svg",
+            fileName: "",
             fileSize: "0KB",
             numRect: "0",
             numCirc: "0",
@@ -58,6 +58,8 @@ $(document).ready(function() {
                     let cell0 = row.insertCell(0);
                     let img = document.createElement('img');
                     img.src = "./uploads/"+data[k].fileName;
+                    // img.download = "./uploads/"+data[k].fileName;
+                    // img.click();
                     img.height = 100;
                     img.width = 100;
                     cell0.appendChild(img);
@@ -68,7 +70,7 @@ $(document).ready(function() {
                     let linkText = document.createTextNode(data[k].fileName);
                     link.appendChild(linkText);
                     link.href = data[k].fileName;
-                    link.download;
+                    link.download = data[k].fileName;
                     cell1.appendChild(link);
                 }
                 else if(i == 2) {

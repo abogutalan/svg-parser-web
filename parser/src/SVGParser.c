@@ -2710,4 +2710,83 @@ char * showCircAttributes(SVGimage * img) {
 
 }
 
+char * showPathAttributes(SVGimage * img) {
+
+    int len = 500; 
+    char * attrListJSON = (char*)malloc(sizeof(char)*len);
+
+    strcpy(attrListJSON, "[");
+
+
+    ListIterator iterator, tmpIter;
+    void * tmp;
+    iterator = createIterator(img->paths);
+    tmp = nextElement(&iterator);
+    while (tmp != NULL) {
+        Path * tmpPath = (Path *)tmp;
+
+        
+        char * tmpStr = attrListToJSON(tmpPath->otherAttributes);
+
+        tmpIter = iterator;
+        if (nextElement(&tmpIter) == NULL)
+        {
+            strcat(attrListJSON, tmpStr);
+        }
+        else
+        {
+            strcat(attrListJSON, strcat(tmpStr, ","));
+        }
+
+        free(tmpStr);
+        
+                   
+    tmp = nextElement(&iterator);
+    }
+    strcat(attrListJSON, "]");
+
+
+    return attrListJSON;
+
+}
+
+char * showGroupAttributes(SVGimage * img) {
+
+    int len = 500; 
+    char * attrListJSON = (char*)malloc(sizeof(char)*len);
+
+    strcpy(attrListJSON, "[");
+
+
+    ListIterator iterator, tmpIter;
+    void * tmp;
+    iterator = createIterator(img->groups);
+    tmp = nextElement(&iterator);
+    while (tmp != NULL) {
+        Group * tmpGrp = (Group *)tmp;
+
+        
+        char * tmpStr = attrListToJSON(tmpGrp->otherAttributes);
+
+        tmpIter = iterator;
+        if (nextElement(&tmpIter) == NULL)
+        {
+            strcat(attrListJSON, tmpStr);
+        }
+        else
+        {
+            strcat(attrListJSON, strcat(tmpStr, ","));
+        }
+
+        free(tmpStr);
+        
+                   
+    tmp = nextElement(&iterator);
+    }
+    strcat(attrListJSON, "]");
+
+
+    return attrListJSON;
+
+}
 

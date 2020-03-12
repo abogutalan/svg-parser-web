@@ -81,7 +81,9 @@ let sharedLib = ffi.Library('./libsvgparse', {
       'mySVGToPathJSON': [ 'string', [ 'pointer' ] ],
       'mySVGToGroupJSON': [ 'string', [ 'pointer' ] ],
       'showRectAttributes': [ 'string', [ 'pointer' ] ],      
-      'showCircAttributes': [ 'string', [ 'pointer' ] ]      
+      'showCircAttributes': [ 'string', [ 'pointer' ] ],     
+      'showPathAttributes': [ 'string', [ 'pointer' ] ],     
+      'showGroupAttributes': [ 'string', [ 'pointer' ] ]      
 
 });
 
@@ -123,51 +125,14 @@ app.get('/uploadedFiles', function(req, res) {
       };
   
       myStack.push(myJson);
-    }
-    
+    }    
 
   }
-
   
   // console.log("The data being sent is : ");
   // console.log(myStack);
 
   res.send(myStack);
-});
-
-/* show attributes table */                                 // to do : check validation of svg
-app.get('/showOtherAttr', function(req, res) {
-
-  let stack = [];
-  let path;
-  var fs = require('fs');
-  var files = fs.readdirSync("./uploads/");
-
-  for (var i in files) {
-
-    path = "./uploads/"+ files[i];
-
-    let showAttrSVGimage = sharedLib.createValidSVGimage(path, "parser/validation/svg.xsd");
-
-    let rectAttr = sharedLib.showRectAttributes(showAttrSVGimage);
-    let circleAttr = sharedLib.showCircAttributes(showAttrSVGimage);
-  
-    rectAttr = JSON.parse(rectAttr);
-    circleAttr = JSON.parse(circleAttr);
-    console.log(circleAttr);
-
-
-    let showAttrJSON = {
-      fileName: files[i],
-      otherAttrOfRects : rectAttr,
-      otherAttrOfCircs : circleAttr 
-    };
-    stack.push(showAttrJSON);
-  }
-  console.log("show attribute json array is: ");
- // console.log(stack); 
-
-  res.send(stack);
 });
 
 
@@ -203,8 +168,16 @@ app.get('/svgView', function(req, res){
       */
       let paths = sharedLib.mySVGToPathJSON(panelSVGimage);
       let groups = sharedLib.mySVGToGroupJSON(panelSVGimage);
-  
       
+    let rectAttr = sharedLib.showRectAttributes(panelSVGimage);
+    let circleAttr = sharedLib.showCircAttributes(panelSVGimage);  
+    //let pathAttr = sharedLib.showPathAttributes(panelSVGimage);  
+    let groupAttr = sharedLib.showGroupAttributes(panelSVGimage);  
+    rectAttr = JSON.parse(rectAttr);
+    circleAttr = JSON.parse(circleAttr);
+    //pathAttr = JSON.parse(pathAttr);
+    groupAttr = JSON.parse(groupAttr);
+    console.log(groupAttr);
   
       rects = JSON.parse(rects);
       circles = JSON.parse(circles);
@@ -219,7 +192,11 @@ app.get('/svgView', function(req, res){
         rects: rects,
         circles: circles,
         paths: paths,
-        groups: groups
+        groups: groups,
+        otherAttrOfRects: rectAttr,
+        otherAttrOfCircs: circleAttr,
+        otherAttrOfPaths: "",
+        otherAttrOfGroups: groupAttr
       };
       stack.push(svgViewJSON);
     }

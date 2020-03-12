@@ -401,6 +401,8 @@ char * mySVGToPathJSON(SVGimage * img);
 char * mySVGToGroupJSON(SVGimage * img);
 char * showRectAttributes(SVGimage * img);
 char * showCircAttributes(SVGimage * img);
+char * showPathAttributes(SVGimage * img);
+char * showGroupAttributes(SVGimage * img);
 
 
 /* ******************************* List helper functions  - MUST be implemented *************************** */

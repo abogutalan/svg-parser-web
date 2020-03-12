@@ -116,7 +116,11 @@ $(document).ready(function() {
             rects: "rects",
             circles: "circles",
             paths: "paths",
-            groups: "groups"
+            groups: "groups",
+            otherAttrOfRects: "",
+            otherAttrOfCircs: "",
+            otherAttrOfPaths: "",
+            otherAttrOfGroups: ""
         },
         success: function (data) {
             console.log("data size of svg view panel: "+data.length);                     
@@ -158,49 +162,47 @@ $(document).ready(function() {
     });
 
     // Showing other attributes
-    $.ajax({
-        type: 'get',            //Request type
-        dataType: 'json',       //Data type - we will use JSON for almost everything 
-        url: '/showOtherAttr',   //The server endpoint we are connecting to
-        data: {
-            fileName: "",
-            otherAttrOfRects: "",
-            otherAttrOfCircs: "",
-            otherAttrOfPaths: "",
-            otherAttrOfGroups: ""
-        },
-        success: function (data) {
-            console.log("data has been taken");
+    // $.ajax({
+    //     type: 'get',            //Request type
+    //     dataType: 'json',       //Data type - we will use JSON for almost everything 
+    //     url: '/showOtherAttr',   //The server endpoint we are connecting to
+    //     data: {
+    //         fileName: "",
+    //         otherAttrOfRects: "",
+    //         otherAttrOfCircs: "",
+    //         otherAttrOfPaths: "",
+    //         otherAttrOfGroups: ""
+    //     },
+    //     success: function (data) {
+    //         console.log("data has been taken");
 
-            for(let k = 0; k < data.length; k++){ 
+    //         for(let k = 0; k < data.length; k++){ 
 
-                var table=document.getElementById("otherAttrTable");
+    //             var table=document.getElementById("otherAttrTable");
                
-            console.log("first loop");
 
                 
-                for ( var i in data[k].otherAttrOfCircs) {
-                    var row = table.insertRow(table.rows.length);
+    //             for ( var i in data[k].otherAttrOfCircs) {
+    //                 var row = table.insertRow(table.rows.length);
 
-                    // to do : don't forget to put them in order ie. rect, circle, path , group
+    //                 // to do : don't forget to put them in order ie. rect, circle, path , group
 
-                    /* other attributes of circles */
-                    let cellAttr = row.insertCell(0);
-                    cellAttr.innerHTML="Other Attributes of " + data[k].fileName + " ==> { name: " + data[k].otherAttrOfCircs[i][0].name + ", value: " + data[k].otherAttrOfCircs[i][0].value + " } ";
+    //                 /* other attributes of circles */
+    //                 let cellAttr = row.insertCell(0);
+    //                 cellAttr.innerHTML="Other Attributes of " + data[k].fileName + " ==> { name: " + data[k].otherAttrOfCircs[i][0].name + ", value: " + data[k].otherAttrOfCircs[i][0].value + " } ";
         
-            console.log("seond loop");
 
-                }
+    //             }
                     
-                // let cellAttr = row.insertCell(0);
-                // cellAttr.innerHTML=data[k].otherAttrOfCircs;
-            }
-        },      
-        fail: function(error) {
-            console.log("ERROR in other Attributes Table!");
-            console.log(error);
-        }
-    });
+    //             // let cellAttr = row.insertCell(0);
+    //             // cellAttr.innerHTML=data[k].otherAttrOfCircs;
+    //         }
+    //     },      
+    //     fail: function(error) {
+    //         console.log("ERROR in other Attributes Table!");
+    //         console.log(error);
+    //     }
+    // });
 
     function populateSvgViewPanel(data) {
         let imgPath = "./uploads/" + data.fileName;
@@ -321,7 +323,7 @@ $(document).ready(function() {
         
     }
 
-    function addRects(table, data) {
+    function addRects(table, data) { // selected data from drop down list
 
         for ( var i in data.rects) {
             var row = table.insertRow(table.rows.length);
@@ -331,6 +333,7 @@ $(document).ready(function() {
             let firstElement = document.createElement('p');
             let firstText = document.createTextNode("Rectangle " + (+i + 1));
             firstElement.appendChild(firstText);
+            firstElement.id = "componentID";
             firstColumn.appendChild(firstElement);
         /* summary */
             let secondCell =  row.insertCell(1);
@@ -344,6 +347,29 @@ $(document).ready(function() {
             let thirdElement = document.createElement('p');
             let thirdText = document.createTextNode(data.rects[i].numAttr);
             thirdElement.appendChild(thirdText);
+            /* showing the attributes of selected elements in other attributes columns */
+            thirdElement.style.backgroundColor = "orange";
+            thirdElement.addEventListener("click", function(){
+                
+                let showAttrtable=document.getElementById("otherAttrTable");
+                //console.log("this content: "  + this.textContent);
+                console.log("Showing the attributes of "  + firstText.data);
+
+                /* getting the ordinal number */
+                let componentTextContent = firstText.data;
+                let len = componentTextContent.length - +1;
+                let orderNum = parseInt(componentTextContent.charAt(len));
+                let index = orderNum - +1;
+
+                for ( var j in data.otherAttrOfRects[index]) {
+                    let row = showAttrtable.insertRow(showAttrtable.rows.length);    
+
+                    let cellAttr = row.insertCell(0);                        
+                    cellAttr.innerHTML="Other Attributes of : " + componentTextContent + " { name: " + data.otherAttrOfRects[index][j].name + ", value: " + data.otherAttrOfRects[index][j].value + " } ";        
+
+                }
+                
+            });
             thirdCell.appendChild(thirdElement);
             
         }        
@@ -372,6 +398,29 @@ $(document).ready(function() {
             let thirdElement = document.createElement('p');
             let thirdText = document.createTextNode(data.circles[i].numAttr);
             thirdElement.appendChild(thirdText);
+            /* showing attributes of circles */
+            thirdElement.style.backgroundColor = "orange";
+            thirdElement.addEventListener("click", function(){
+
+                let showAttrtable=document.getElementById("otherAttrTable");
+                //console.log("this content: "  + this.textContent);
+                console.log("Showing the attributes of "  + firstText.data);
+
+                /* getting the ordinal number */
+                let componentTextContent = firstText.data;
+                let len = componentTextContent.length - +1;
+                let orderNum = parseInt(componentTextContent.charAt(len));
+                let index = orderNum - +1;
+
+                for ( var j in data.otherAttrOfCircs[index]) {
+                    let row = showAttrtable.insertRow(showAttrtable.rows.length);    
+
+                    let cellAttr = row.insertCell(0);                        
+                    cellAttr.innerHTML="Other Attributes of : " + componentTextContent + " { name: " + data.otherAttrOfCircs[index][j].name + ", value: " + data.otherAttrOfCircs[index][j].value + " } ";        
+
+                }
+                
+            });
             thirdCell.appendChild(thirdElement);
             
         }        
@@ -399,6 +448,28 @@ $(document).ready(function() {
             let thirdElement = document.createElement('p');
             let thirdText = document.createTextNode(data.paths[i].numAttr);
             thirdElement.appendChild(thirdText);
+            thirdElement.style.backgroundColor = "orange";
+            thirdElement.addEventListener("click", function(){
+
+                let showAttrtable=document.getElementById("otherAttrTable");
+                //console.log("this content: "  + this.textContent);
+                console.log("Showing the attributes of "  + firstText.data);
+
+                /* getting the ordinal number */
+                let componentTextContent = firstText.data;
+                let len = componentTextContent.length - +1;
+                let orderNum = parseInt(componentTextContent.charAt(len));
+                let index = orderNum - +1;
+
+                for ( var j in data.otherAttrOfPaths[index]) {
+                    let row = showAttrtable.insertRow(showAttrtable.rows.length);    
+
+                    let cellAttr = row.insertCell(0);                        
+                    cellAttr.innerHTML="Other Attributes of : " + componentTextContent + " { name: " + data.otherAttrOfPaths[index][j].name + ", value: " + data.otherAttrOfPaths[index][j].value + " } ";        
+
+                }
+                
+            });
             thirdCell.appendChild(thirdElement);
             
         }        
@@ -426,6 +497,29 @@ $(document).ready(function() {
             let thirdElement = document.createElement('p');
             let thirdText = document.createTextNode(data.groups[i].numAttr);
             thirdElement.appendChild(thirdText);
+            thirdElement.style.backgroundColor = "orange";
+            thirdElement.addEventListener("click", function(){
+
+                let showAttrtable=document.getElementById("otherAttrTable");
+                //console.log("this content: "  + this.textContent);
+                console.log("Showing the attributes of "  + firstText.data);
+
+                /* getting the ordinal number */
+                let componentTextContent = firstText.data;
+                let len = componentTextContent.length - +1;
+                let orderNum = parseInt(componentTextContent.charAt(len));
+                console.log(orderNum);
+                let index = orderNum - +1;
+
+                for ( var j in data.otherAttrOfGroups[index]) {
+                    let row = showAttrtable.insertRow(showAttrtable.rows.length);    
+
+                    let cellAttr = row.insertCell(0);                        
+                    cellAttr.innerHTML= "Other Attributes of : " + componentTextContent + " { name: " + data.otherAttrOfGroups[index][j].name + ", value: " + data.otherAttrOfGroups[index][j].value + " } ";        
+
+                }
+                
+            });
             thirdCell.appendChild(thirdElement);
             
         }        
@@ -446,7 +540,7 @@ $(document).ready(function() {
     
     $("#submitUploadFile").click(function() {
         //listener
-       console.log("test");
+       console.log("submiting uploaded file");
 
        
   

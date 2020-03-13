@@ -20,7 +20,7 @@
     
     <p></p>
     <!--      <img src="rects.svg">         -->
-
+<!--
     <hr>
     <div id="blah">I am blah</div>
     <hr>
@@ -35,9 +35,9 @@
             <input type='submit' class="btn btn-secondary">
         </div>
     </form>
-
+-->
     <!-- File Log Table -->
-    <h3>File log panel</h3>
+    <h3 class="myHeaders">File log panel</h3>
     <div class="fileLog"> 
       <table id="fileLogTable">
         <tr>
@@ -107,7 +107,7 @@
 
 
 <!-- File Log Table -->
-<h3>Show Attributes Table</h3>
+<h3 class="myHeaders">Show Attributes Table</h3>
 <div class="otherAttributesClass"> 
   <table id="otherAttrTable">
     <tr>
@@ -117,8 +117,9 @@
   </table>
  </div>
 
+<p></p>
 
-    
+   
 
     <!-- editing attributes -->
     
@@ -145,8 +146,40 @@
             </div>
     </form>
 
+    <p></p>
+
     <hr>
-        <div id="creatingNewSVG">Creating New SVG Object</div>
+        <div class="myHeaders" id="creatingNewSVG">Edit Title And Description</div>
+    <hr>
+
+    <!-- Drop Down List -->   
+<div class="dropdown">
+    <button class="dropbtn">Dropdown to edit Title & Desc</button>
+    <select id="editTitleAndDesc" class="dropdown-content">
+        <option value="None">-- Select --</option>
+    </select>
+</div>
+
+
+    
+    <form ref='editTitleDescForm'
+          id='editTitleDescForm'>
+                        
+            <div class="form-group">
+                <input type="text" class="form-control" id="editTitleBox" value="title" placeholder="Placeholder" maxlength="255" required>
+            </div>
+            <div class="form-group">
+                <input type="text" class="form-control" id="editDescBox" value="description" placeholder="Placeholder" maxlength="255" required>
+            </div>
+            <div class="form-group">
+                <input type='submit' value="Click to Edit" class="btn btn-secondary">
+            </div>
+    </form>
+
+<p></p>
+
+    <hr>
+        <div class="myHeaders" id="creatingNewSVG">Creating New SVG Object</div>
     <hr>
     <form ref='newSVGForm'
           id='newSVGForm'>

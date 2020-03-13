@@ -404,7 +404,7 @@ char * showCircAttributes(SVGimage * img);
 char * showPathAttributes(SVGimage * img);
 char * showGroupAttributes(SVGimage * img);
 void createNewSVGobject(char* fileName, char* newTitle, char* desc);
-
+void setTitleAndDesc(SVGimage * img, char* newTitle, char* newDesc, char* filename);
 
 /* ******************************* List helper functions  - MUST be implemented *************************** */
 

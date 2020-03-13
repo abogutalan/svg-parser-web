@@ -84,7 +84,8 @@ let sharedLib = ffi.Library('./libsvgparse', {
       'showCircAttributes': [ 'string', [ 'pointer' ] ],     
       'showPathAttributes': [ 'string', [ 'pointer' ] ],     
       'showGroupAttributes': [ 'string', [ 'pointer' ] ],      
-      'createNewSVGobject': [ 'void', [ 'string', 'string', 'string' ] ]      
+      'createNewSVGobject': [ 'void', [ 'string', 'string', 'string' ] ],      
+      'setTitleAndDesc': [ 'void', [ 'pointer', 'string', 'string', 'string' ] ]      
 
 });
 
@@ -110,10 +111,12 @@ app.get('/uploadedFiles', function(req, res) {
 
     /* converting SVG image to JSON string */
     var SVGimage = sharedLib.createValidSVGimage(path, "parser/validation/svg.xsd");
+    console.log("+++Invalid check: "+ SVGimage);
+
     var svgJson = sharedLib.SVGtoJSON(SVGimage);
 
     /* checking if the svg is valid */
-    if ( svgJson != "invalid SVG") {
+    if ( svgJson !== "invalid SVG!") {
       svgJson = JSON.parse(svgJson);
 
       var myJson = {
@@ -146,6 +149,50 @@ app.post('/edit', function(req, res) {
         var tokenizedData = data[i].split("=");
         output[tokenizedData[0]] = tokenizedData[1];
     }
+    /* title */
+    let titleStr = output.title.toString();
+    let titleWords = titleStr.split('+');
+    let title = "";
+    for ( let i = 0; i < titleWords.length; i++){
+      title += titleWords[i] + " ";
+    }
+    /* decription */
+    let descStr = output.description.toString();
+    let descWords = descStr.split('+');
+    let description = "";
+    for ( let i = 0; i < descWords.length; i++){
+      description += descWords[i] + " ";
+    }
+    /* filename */
+    let filename = output.fileName.toString();
+
+    /* check if file name has .svg extension */
+    let extension = filename.substring(filename.length - +4, filename.length);
+
+    /* creating new valid SVG */
+    if((".svg" === extension) && (filename.length != 0)) {
+      sharedLib.createNewSVGobject("./uploads/" + filename, title, description);
+    }
+    else console.log("Invalid extension or empty file name ERROR !");
+  })
+  
+  console.log(output); //empty 
+  
+  res.redirect('/');
+
+});
+
+app.post('/editTitleAndDescription', function(req, res) {
+  var output = {};
+  var path;
+  
+  req.on('data', function(data) {
+    data = data.toString();
+    data = data.split('&');
+    for (let i = 0; i < data.length; i++) {
+        var tokenizedData = data[i].split("=");
+        output[tokenizedData[0]] = tokenizedData[1];
+    }
     console.log("posted data:");
     /* title */
     let titleStr = output.title.toString();
@@ -166,46 +213,35 @@ app.post('/edit', function(req, res) {
     /* filename */
     let filename = output.fileName.toString();
     console.log("filename : " + filename);
-    sharedLib.createNewSVGobject("./uploads/" + filename, title, description);
+
+    /* check if file name has .svg extension */
+    let extension = filename.substring(filename.length - +4, filename.length);
+    console.log("Extension of SVG :", extension);
+
+    path = "./uploads/"+ filename.toString();
+    console.log("testing path: "+ path);
+
+    if(filename.length != 0) {
+      let img = sharedLib.createValidSVGimage(path, "parser/validation/svg.xsd");
+      sharedLib.setTitleAndDesc(img, title, description, path);
+    }
+    else console.log("File name is empty!");
+
+    
+
+    /* creating new valid SVG */
+    // if(".svg" === extension) {
+    //   sharedLib.createNewSVGobject("./uploads/" + filename, title, description);
+    // }
   })
   
-  console.log(output); //empty array
+  // console.log(output); //empty 
   
   res.redirect('/');
 
 });
 
 
-
-// app.post('/edit', function(req, res) {
-//   var output = {};
-  
-//   req.on('data', function(data) {
-//     data = data.toString();
-//     // console.log("data is : "+data);
-
-//     data = data.split('&');
-//     for (var i = 0; i < data.length; i++) {
-//         var tokenizedData = data[i].split("=");
-//         output[tokenizedData[0]] = tokenizedData[1];
-//     }
-//     console.log("posted data: " + output);
-//     let tmpFN = output.fileName;
-//     let filename = tmpFN.replace("+", " ");
-//     var title = output.title;
-//     title.replace("+", " ");
-
-//     var desc = output.description;
-//     title.replace("+", " ");
-
-//      console.log(title);
-//   })
-  
-//   // console.log(output); //empty array
-  
-//   res.redirect('/');
-
-// });
 
 
 /* svg view panel */
@@ -226,7 +262,7 @@ app.get('/svgView', function(req, res){
     var svgTitle = sharedLib.getSVGTitle(panelSVGimage);
 
     /* if it is a valid SVG */
-    if ( svgTitle != "Invalid SVG!") {
+    if ( svgTitle !== "Invalid SVG!") {
       var svgDesc = sharedLib.getSVGDescription(panelSVGimage);
 
 

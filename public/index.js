@@ -1,4 +1,5 @@
 // Put all onload AJAX calls here, and event listeners
+
 $(document).ready(function() {
     // On page-load AJAX Example
     $.ajax({
@@ -129,6 +130,10 @@ $(document).ready(function() {
 
             var dropDownContent = document.getElementById("mySelect");
 
+            /* drop down for edit title and description */ 
+            var editDropDown = document.getElementById("editTitleAndDesc");
+
+
             for (var i in data) {
                 var option = document.createElement("option");
                 option.value = data[i].fileName;
@@ -136,9 +141,17 @@ $(document).ready(function() {
                 dropDownContent.add(option);
             }
 
+                /* add to edit drop down to edit title & description later*/
+            for (var i in data) {
+                var option = document.createElement("option");
+                option.value = data[i].fileName;
+                option.text = data[i].fileName;
+                editDropDown.add(option);
+            }
+
             
             document.getElementById('mySelect').addEventListener('change', update, true);
-            var curVal;
+            let curVal;
             function update(dropDownList) {
                 
                 curVal = dropDownList.currentTarget.value;
@@ -256,9 +269,7 @@ $(document).ready(function() {
         let descCell = row2.insertCell(1);
     
         var img = document.createElement('img');
-        img.src = imgPath;
-        img.height = 200;
-        img.width = 200;
+        img.src = imgPath;        
         img.className = 'logo';
         imgCell.appendChild(img);
     
@@ -471,7 +482,7 @@ $(document).ready(function() {
                 let componentTextContent = firstText.data;
                 let len = componentTextContent.length - +1;
                 let orderNum = parseInt(componentTextContent.charAt(len));
-                console.log(orderNum);
+                //console.log(orderNum);
                 let index = orderNum - +1;
 
                 for ( var j in data.otherAttrOfGroups[index]) {
@@ -491,14 +502,14 @@ $(document).ready(function() {
 
     // Event listener form example , we can use this instead explicitly listening for events
     // No redirects if possible
-    $('#someform').submit(function(e){
-        $('#blah').html("Form has data: "+$('#entryBox').val());
-        e.preventDefault();
-        //Pass data to the Ajax call, so it gets passed to the server
-        $.ajax({
-            //Create an object for connecting to another waypoint
-        });
-    });
+    // $('#someform').submit(function(e){
+    //     $('#blah').html("Form has data: "+$('#entryBox').val());
+    //     e.preventDefault();
+    //     //Pass data to the Ajax call, so it gets passed to the server
+    //     $.ajax({
+    //         //Create an object for connecting to another waypoint
+    //     });
+    // });
 
     
     $("#submitUploadFile").click(function() {
@@ -519,10 +530,48 @@ $(document).ready(function() {
         });
     });
 
+    var globalCurVal = "";
+    document.getElementById('editTitleAndDesc').addEventListener('change', update2, true);
+
+    function update2(drpdwn) {
+                
+        globalCurVal = drpdwn.currentTarget.value;
+        console.log("Selected item : "+globalCurVal); 
+
+        /* drop downdaki elementi aldıktan sonra title ve desc ile post et gerisi kağıtta yazıyo (createNewSVGobject benzeri) */
+        
+    }
+    $('#editTitleDescForm').submit(function(e){              
+        console.log("Editing Filename and Desc of "+globalCurVal); 
+
+        e.preventDefault();
+        //Pass data to the Ajax call, so it gets passed to the server
+        $.ajax({
+            //Create an object for connecting to another waypoint
+
+            type: 'post',
+            dataType: 'json',
+            url: '/editTitleAndDescription',
+            data: { 
+                title: $('#editTitleBox').val(),
+                description: $('#editDescBox').val(),
+                fileName: globalCurVal   
+            },
+            success: function (data) {
+                console.log(data);
+            },
+            fail: function(error) {
+                console.log("Error editing!");
+                console.log(error);
+            }
+            
+        });
+    });
+
     
     $('#newSVGForm').submit(function(e){
         
-        console.log("Newly created SVG ==> filename: " + $('#filenameBox').val() + " - title: " + $('#titleBox').val() + " - description: " + $('#descBox').val());
+        console.log("Create SVG button clicked!");
         e.preventDefault();
         //Pass data to the Ajax call, so it gets passed to the server
         $.ajax({

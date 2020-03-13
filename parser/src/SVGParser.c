@@ -1751,7 +1751,7 @@ SVGimage* createValidSVGimage(char* fileName, char* schemaFile) {
     xmlMemoryDump();
 
     if ( ret == 0 ) {
-        if(validSVG != NULL) return validSVG;
+        if(validSVG != NULL)  return validSVG;
     }
 
     return NULL;
@@ -1794,10 +1794,20 @@ void createNewSVGobject(char* fileName, char* newTitle, char* desc) {
 
     if (valid == 1) {
         writeSVGimage(img, fileName);
-        printf("Writing image is successful!\n");
+        printf("Creating new image is successful!\n");
     } 
     else deleteSVGimage(img);
     
+
+}
+
+void setTitleAndDesc(SVGimage * img, char* newTitle, char* newDesc, char* filename) {
+
+    strcpy(img->title, newTitle);
+    strcpy(img->description, newDesc);
+    int ret = writeSVGimage(img, filename);
+    if (ret == 1) printf("SVG title and description edited successfully\n");
+    else printf("Something went wrong while editing title and description !\n");
 
 }
 
@@ -2542,7 +2552,7 @@ char* groupListToJSON(const List *list){
 char* SVGtoJSON(const SVGimage* imge){
 
     int ret = validateSVGimage((SVGimage*)imge, "parser/validation/svg.xsd");
-	if (ret==0) return "invalid SVG";
+	if (ret==0) return "invalid SVG!";
 
     char * svgJSON = NULL;
 

@@ -280,7 +280,7 @@ app.get('/svgView', function(req, res){
     pathAttr = JSON.parse(pathAttr);
     groupAttr = JSON.parse(groupAttr);
 
-    console.log(pathAttr);
+    // console.log(pathAttr);
   
       rects = JSON.parse(rects);
       circles = JSON.parse(circles);
@@ -307,7 +307,7 @@ app.get('/svgView', function(req, res){
     
   }
 
-  console.log("JSON to svg view panel is: ");
+  // console.log("JSON to svg view panel is: ");
  // console.log(stack); 
 
   res.send(stack);

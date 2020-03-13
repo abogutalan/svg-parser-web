@@ -1,5 +1,9 @@
 'use strict'
 
+/*
+*   Abdullah Ogutalan
+*   1109732     A3
+*/
 // C library API
 const ffi = require('ffi-napi');
 
@@ -111,7 +115,6 @@ app.get('/uploadedFiles', function(req, res) {
 
     /* converting SVG image to JSON string */
     var SVGimage = sharedLib.createValidSVGimage(path, "parser/validation/svg.xsd");
-    console.log("+++Invalid check: "+ SVGimage);
 
     var svgJson = sharedLib.SVGtoJSON(SVGimage);
 
@@ -129,7 +132,8 @@ app.get('/uploadedFiles', function(req, res) {
       };
   
       myStack.push(myJson);
-    }    
+    }  
+    else fs.unlinkSync(path);
 
   }
   
@@ -176,7 +180,7 @@ app.post('/edit', function(req, res) {
     else console.log("Invalid extension or empty file name ERROR !");
   })
   
-  console.log(output); //empty 
+  // console.log(output); //empty 
   
   res.redirect('/');
 
@@ -193,7 +197,7 @@ app.post('/editTitleAndDescription', function(req, res) {
         var tokenizedData = data[i].split("=");
         output[tokenizedData[0]] = tokenizedData[1];
     }
-    console.log("posted data:");
+    // console.log("posted data:");
     /* title */
     let titleStr = output.title.toString();
     let titleWords = titleStr.split('+');
@@ -201,7 +205,7 @@ app.post('/editTitleAndDescription', function(req, res) {
     for ( let i = 0; i < titleWords.length; i++){
       title += titleWords[i] + " ";
     }
-    console.log("title : "+title);
+    // console.log("title : "+title);
     /* decription */
     let descStr = output.description.toString();
     let descWords = descStr.split('+');
@@ -209,17 +213,17 @@ app.post('/editTitleAndDescription', function(req, res) {
     for ( let i = 0; i < descWords.length; i++){
       description += descWords[i] + " ";
     }
-    console.log("description : " + description);
+    // console.log("description : " + description);
     /* filename */
     let filename = output.fileName.toString();
-    console.log("filename : " + filename);
+    // console.log("filename : " + filename);
 
     /* check if file name has .svg extension */
     let extension = filename.substring(filename.length - +4, filename.length);
-    console.log("Extension of SVG :", extension);
+    // console.log("Extension of SVG :", extension);
 
     path = "./uploads/"+ filename.toString();
-    console.log("testing path: "+ path);
+    // console.log("testing path: "+ path);
 
     if(filename.length != 0) {
       let img = sharedLib.createValidSVGimage(path, "parser/validation/svg.xsd");
@@ -273,11 +277,11 @@ app.get('/svgView', function(req, res){
       
     let rectAttr = sharedLib.showRectAttributes(panelSVGimage);
     let circleAttr = sharedLib.showCircAttributes(panelSVGimage);  
-    // let pathAttr = sharedLib.showPathAttributes(panelSVGimage);  
+    let pathAttr = sharedLib.showPathAttributes(panelSVGimage);  
     let groupAttr = sharedLib.showGroupAttributes(panelSVGimage);  
     rectAttr = JSON.parse(rectAttr);
     circleAttr = JSON.parse(circleAttr);
-    // pathAttr = JSON.parse(pathAttr);
+    pathAttr = JSON.parse(pathAttr);
     groupAttr = JSON.parse(groupAttr);
 
     // console.log(pathAttr);
@@ -298,7 +302,7 @@ app.get('/svgView', function(req, res){
         groups: groups,
         otherAttrOfRects: rectAttr,
         otherAttrOfCircs: circleAttr,
-        otherAttrOfPaths: "",
+        otherAttrOfPaths: pathAttr,
         otherAttrOfGroups: groupAttr
       };
       stack.push(svgViewJSON);
@@ -307,7 +311,7 @@ app.get('/svgView', function(req, res){
     
   }
 
-  console.log("JSON to svg view panel is: ");
+  // console.log("JSON to svg view panel is: ");
  // console.log(stack); 
 
   res.send(stack);

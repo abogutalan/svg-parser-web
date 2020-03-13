@@ -423,7 +423,7 @@ $(document).ready(function() {
             thirdElement.style.backgroundColor = "orange";
             thirdElement.addEventListener("click", function(){
 
-                alert("Show attributes for paths does not work properly !");
+                //alert("Show attributes for paths does not work properly !");
 
                 let showAttrtable=document.getElementById("otherAttrTable");
                 //console.log("this content: "  + this.textContent);

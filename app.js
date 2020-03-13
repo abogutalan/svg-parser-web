@@ -111,7 +111,6 @@ app.get('/uploadedFiles', function(req, res) {
 
     /* converting SVG image to JSON string */
     var SVGimage = sharedLib.createValidSVGimage(path, "parser/validation/svg.xsd");
-    console.log("+++Invalid check: "+ SVGimage);
 
     var svgJson = sharedLib.SVGtoJSON(SVGimage);
 
@@ -129,7 +128,8 @@ app.get('/uploadedFiles', function(req, res) {
       };
   
       myStack.push(myJson);
-    }    
+    }  
+    else fs.unlinkSync(path);
 
   }
   
@@ -273,14 +273,14 @@ app.get('/svgView', function(req, res){
       
     let rectAttr = sharedLib.showRectAttributes(panelSVGimage);
     let circleAttr = sharedLib.showCircAttributes(panelSVGimage);  
-    // let pathAttr = sharedLib.showPathAttributes(panelSVGimage);  
+    let pathAttr = sharedLib.showPathAttributes(panelSVGimage);  
     let groupAttr = sharedLib.showGroupAttributes(panelSVGimage);  
     rectAttr = JSON.parse(rectAttr);
     circleAttr = JSON.parse(circleAttr);
-    // pathAttr = JSON.parse(pathAttr);
+    pathAttr = JSON.parse(pathAttr);
     groupAttr = JSON.parse(groupAttr);
 
-    // console.log(pathAttr);
+    console.log(pathAttr);
   
       rects = JSON.parse(rects);
       circles = JSON.parse(circles);
@@ -298,7 +298,7 @@ app.get('/svgView', function(req, res){
         groups: groups,
         otherAttrOfRects: rectAttr,
         otherAttrOfCircs: circleAttr,
-        otherAttrOfPaths: "",
+        otherAttrOfPaths: pathAttr,
         otherAttrOfGroups: groupAttr
       };
       stack.push(svgViewJSON);

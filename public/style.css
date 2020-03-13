@@ -24,6 +24,7 @@ input[type=submit], button {
     cursor: pointer;
     cursor: hand;
 }
+
 table th {
     border: 1px solid #000;
     border-collapse: collapse;

@@ -1769,6 +1769,38 @@ SVGimage* createValidSVGimage(char* fileName, char* schemaFile) {
  	fileName - the name of the output file
  **/
 
+/* creating new svg for web */
+void createNewSVGobject(char* fileName, char* newTitle, char* desc) {
+
+
+    SVGimage * img = (SVGimage*)malloc(sizeof(SVGimage));
+    strcpy(img->namespace, "http://www.w3.org/2000/svg");
+    strcpy(img->title, newTitle);
+    strcpy(img->description, desc);
+
+    List * otherAttrListOfSVG = initializeList(&attributeToString, &deleteAttribute, &compareAttributes);
+    List * rectList = initializeList(&rectangleToString, &deleteRectangle, &compareRectangles);
+    List * circleList = initializeList(&circleToString, &deleteCircle, &compareCircles);
+    List * pathList = initializeList(&pathToString, &deletePath, &comparePaths);
+    List * groupList = initializeList(&groupToString, &deleteGroup, compareGroups);
+ 
+    (img)->otherAttributes = otherAttrListOfSVG;
+    (img)->rectangles = rectList;           
+    (img)->circles = circleList;
+    (img)->paths = pathList;
+    (img)->groups = groupList;
+
+    int valid = validateSVGimage(img, "parser/validation/svg.xsd");
+
+    if (valid == 1) {
+        writeSVGimage(img, fileName);
+        printf("Writing image is successful!\n");
+    } 
+    else deleteSVGimage(img);
+    
+
+}
+
 
 bool writeSVGimage(SVGimage* image, char* fileName) {
 
@@ -2724,7 +2756,6 @@ char * showPathAttributes(SVGimage * img) {
     tmp = nextElement(&iterator);
     while (tmp != NULL) {
         Path * tmpPath = (Path *)tmp;
-
         
         char * tmpStr = attrListToJSON(tmpPath->otherAttributes);
 
@@ -2744,7 +2775,6 @@ char * showPathAttributes(SVGimage * img) {
     tmp = nextElement(&iterator);
     }
     strcat(attrListJSON, "]");
-
 
     return attrListJSON;
 

@@ -403,6 +403,7 @@ char * showRectAttributes(SVGimage * img);
 char * showCircAttributes(SVGimage * img);
 char * showPathAttributes(SVGimage * img);
 char * showGroupAttributes(SVGimage * img);
+void createNewSVGobject(char* fileName, char* newTitle, char* desc);
 
 
 /* ******************************* List helper functions  - MUST be implemented *************************** */

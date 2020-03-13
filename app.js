@@ -83,7 +83,8 @@ let sharedLib = ffi.Library('./libsvgparse', {
       'showRectAttributes': [ 'string', [ 'pointer' ] ],      
       'showCircAttributes': [ 'string', [ 'pointer' ] ],     
       'showPathAttributes': [ 'string', [ 'pointer' ] ],     
-      'showGroupAttributes': [ 'string', [ 'pointer' ] ]      
+      'showGroupAttributes': [ 'string', [ 'pointer' ] ],      
+      'createNewSVGobject': [ 'void', [ 'string', 'string', 'string' ] ]      
 
 });
 
@@ -135,6 +136,77 @@ app.get('/uploadedFiles', function(req, res) {
   res.send(myStack);
 });
 
+app.post('/edit', function(req, res) {
+  var output = {};
+  
+  req.on('data', function(data) {
+    data = data.toString();
+    data = data.split('&');
+    for (let i = 0; i < data.length; i++) {
+        var tokenizedData = data[i].split("=");
+        output[tokenizedData[0]] = tokenizedData[1];
+    }
+    console.log("posted data:");
+    /* title */
+    let titleStr = output.title.toString();
+    let titleWords = titleStr.split('+');
+    let title = "";
+    for ( let i = 0; i < titleWords.length; i++){
+      title += titleWords[i] + " ";
+    }
+    console.log("title : "+title);
+    /* decription */
+    let descStr = output.description.toString();
+    let descWords = descStr.split('+');
+    let description = "";
+    for ( let i = 0; i < descWords.length; i++){
+      description += descWords[i] + " ";
+    }
+    console.log("description : " + description);
+    /* filename */
+    let filename = output.fileName.toString();
+    console.log("filename : " + filename);
+    sharedLib.createNewSVGobject("./uploads/" + filename, title, description);
+  })
+  
+  console.log(output); //empty array
+  
+  res.redirect('/');
+
+});
+
+
+
+// app.post('/edit', function(req, res) {
+//   var output = {};
+  
+//   req.on('data', function(data) {
+//     data = data.toString();
+//     // console.log("data is : "+data);
+
+//     data = data.split('&');
+//     for (var i = 0; i < data.length; i++) {
+//         var tokenizedData = data[i].split("=");
+//         output[tokenizedData[0]] = tokenizedData[1];
+//     }
+//     console.log("posted data: " + output);
+//     let tmpFN = output.fileName;
+//     let filename = tmpFN.replace("+", " ");
+//     var title = output.title;
+//     title.replace("+", " ");
+
+//     var desc = output.description;
+//     title.replace("+", " ");
+
+//      console.log(title);
+//   })
+  
+//   // console.log(output); //empty array
+  
+//   res.redirect('/');
+
+// });
+
 
 /* svg view panel */
 app.get('/svgView', function(req, res){
@@ -160,24 +232,19 @@ app.get('/svgView', function(req, res){
 
       let rects = sharedLib.mySVGToRectJSON(panelSVGimage);      
       let circles = sharedLib.mySVGToCircJSON(panelSVGimage);
-      /*
-        finish the c functions for paths and groups in SVG parser.c
-        pass finished json to the front end
-        only other attributes of cirlces finished at the front end
-        if it works for all valid SVGs, try them with INVALID SVG images
-      */
       let paths = sharedLib.mySVGToPathJSON(panelSVGimage);
       let groups = sharedLib.mySVGToGroupJSON(panelSVGimage);
       
     let rectAttr = sharedLib.showRectAttributes(panelSVGimage);
     let circleAttr = sharedLib.showCircAttributes(panelSVGimage);  
-    //let pathAttr = sharedLib.showPathAttributes(panelSVGimage);  
+    // let pathAttr = sharedLib.showPathAttributes(panelSVGimage);  
     let groupAttr = sharedLib.showGroupAttributes(panelSVGimage);  
     rectAttr = JSON.parse(rectAttr);
     circleAttr = JSON.parse(circleAttr);
-    //pathAttr = JSON.parse(pathAttr);
+    // pathAttr = JSON.parse(pathAttr);
     groupAttr = JSON.parse(groupAttr);
-    console.log(groupAttr);
+
+    // console.log(pathAttr);
   
       rects = JSON.parse(rects);
       circles = JSON.parse(circles);

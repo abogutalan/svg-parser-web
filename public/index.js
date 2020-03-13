@@ -27,6 +27,7 @@ $(document).ready(function() {
         }
     });
 
+
     /* *** File Log Panel *** */
     $.ajax({
         type: 'get',
@@ -161,49 +162,9 @@ $(document).ready(function() {
         }
     });
 
-    // Showing other attributes
-    // $.ajax({
-    //     type: 'get',            //Request type
-    //     dataType: 'json',       //Data type - we will use JSON for almost everything 
-    //     url: '/showOtherAttr',   //The server endpoint we are connecting to
-    //     data: {
-    //         fileName: "",
-    //         otherAttrOfRects: "",
-    //         otherAttrOfCircs: "",
-    //         otherAttrOfPaths: "",
-    //         otherAttrOfGroups: ""
-    //     },
-    //     success: function (data) {
-    //         console.log("data has been taken");
+    
 
-    //         for(let k = 0; k < data.length; k++){ 
-
-    //             var table=document.getElementById("otherAttrTable");
-               
-
-                
-    //             for ( var i in data[k].otherAttrOfCircs) {
-    //                 var row = table.insertRow(table.rows.length);
-
-    //                 // to do : don't forget to put them in order ie. rect, circle, path , group
-
-    //                 /* other attributes of circles */
-    //                 let cellAttr = row.insertCell(0);
-    //                 cellAttr.innerHTML="Other Attributes of " + data[k].fileName + " ==> { name: " + data[k].otherAttrOfCircs[i][0].name + ", value: " + data[k].otherAttrOfCircs[i][0].value + " } ";
-        
-
-    //             }
-                    
-    //             // let cellAttr = row.insertCell(0);
-    //             // cellAttr.innerHTML=data[k].otherAttrOfCircs;
-    //         }
-    //     },      
-    //     fail: function(error) {
-    //         console.log("ERROR in other Attributes Table!");
-    //         console.log(error);
-    //     }
-    // });
-
+    
     function populateSvgViewPanel(data) {
         let imgPath = "./uploads/" + data.fileName;
     
@@ -451,9 +412,11 @@ $(document).ready(function() {
             thirdElement.style.backgroundColor = "orange";
             thirdElement.addEventListener("click", function(){
 
+                alert("Show attributes for paths does not work properly !");
+
                 let showAttrtable=document.getElementById("otherAttrTable");
                 //console.log("this content: "  + this.textContent);
-                console.log("Showing the attributes of "  + firstText.data);
+                console.log("Can not show the attributes of "  + firstText.data);
 
                 /* getting the ordinal number */
                 let componentTextContent = firstText.data;
@@ -465,7 +428,7 @@ $(document).ready(function() {
                     let row = showAttrtable.insertRow(showAttrtable.rows.length);    
 
                     let cellAttr = row.insertCell(0);                        
-                    cellAttr.innerHTML="Other Attributes of : " + componentTextContent + " { name: " + data.otherAttrOfPaths[index][j].name + ", value: " + data.otherAttrOfPaths[index][j].value + " } ";        
+                    cellAttr.innerHTML= "Other Attributes of : " + componentTextContent + " { name: " + data.otherAttrOfPaths[index][j].name + ", value: " + data.otherAttrOfPaths[index][j].value + " } ";        
 
                 }
                 
@@ -540,9 +503,45 @@ $(document).ready(function() {
     
     $("#submitUploadFile").click(function() {
         //listener
-       console.log("submiting uploaded file");
-
-       
+       console.log("submiting uploaded file");       
   
-      });
+    });
+
+    $('#editAttrVal').submit(function(e){
+        $('#editName').html("Edit Attr name: "+$('#nameBox').val());
+        $('#editValue').html("Edit Attr value: "+$('#valueBox').val());
+        console.log("Edit Attribute element ==> name: " + $('#nameBox').val() + " - value: " + $('#valueBox').val());
+        e.preventDefault();
+        //Pass data to the Ajax call, so it gets passed to the server
+        $.ajax({
+            //Create an object for connecting to another waypoint
+            
+        });
+    });
+
+    
+    $('#newSVGForm').submit(function(e){
+        
+        console.log("Newly created SVG ==> filename: " + $('#filenameBox').val() + " - title: " + $('#titleBox').val() + " - description: " + $('#descBox').val());
+        e.preventDefault();
+        //Pass data to the Ajax call, so it gets passed to the server
+        $.ajax({
+            //Create an object for connecting to another waypoint
+            type: 'post',
+            dataType: 'json',
+            url: '/edit',
+            data: { 
+                title: $('#titleBox').val(),
+                description: $('#descBox').val(),
+                fileName: $('#filenameBox').val()    
+            },
+            success: function (data) {
+                console.log(data);
+            },
+            fail: function(error) {
+                console.log("Error editing!");
+                console.log(error);
+            }
+        });
+    });
 });

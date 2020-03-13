@@ -58,22 +58,24 @@ $(document).ready(function() {
                 
                 if(i == 0) {
                     let cell0 = row.insertCell(0);
+                    let a = document.createElement('a');
                     let img = document.createElement('img');
-                    img.src = "./uploads/"+data[k].fileName;
-                    // img.download = "./uploads/"+data[k].fileName;
-                    // img.click();
+                    img.src = "uploads/"+data[k].fileName;
+                    a.appendChild(img);                    
+                    a.href = "uploads/"+data[k].fileName;
+                    a.download = data[k].fileName;
                     img.height = 100;
                     img.width = 100;
-                    cell0.appendChild(img);
+                    cell0.appendChild(a);
                 }
                 else if(i == 1) {
                     let cell1 = row.insertCell(1);
-                    let link = document.createElement('a');
-                    let linkText = document.createTextNode(data[k].fileName);
-                    link.appendChild(linkText);
-                    link.href = data[k].fileName;
-                    link.download = data[k].fileName;
-                    cell1.appendChild(link);
+                    let a = document.createElement('a');
+                    let fileN = document.createTextNode(data[k].fileName);
+                    a.appendChild(fileN);
+                    a.href = data[k].fileName;
+                    a.download = data[k].fileName;
+                    cell1.appendChild(a);
                 }
                 else if(i == 2) {
                     let cell2 = row.insertCell(2);
@@ -346,11 +348,15 @@ $(document).ready(function() {
             
         }        
     }
-
+    function circleComponent(row) {
+        
+    }
     function addCircles(table, data) {
 
         for ( var i in data.circles) {
             var row = table.insertRow(table.rows.length);
+
+            circleComponent(row);
 
         /* component */
             let firstColumn = row.insertCell(0);
@@ -427,7 +433,7 @@ $(document).ready(function() {
 
                 let showAttrtable=document.getElementById("otherAttrTable");
                 //console.log("this content: "  + this.textContent);
-                console.log("Can not show the attributes of "  + firstText.data);
+                // console.log("Can not show the attributes of "  + firstText.data);
 
                 /* getting the ordinal number */
                 let componentTextContent = firstText.data;

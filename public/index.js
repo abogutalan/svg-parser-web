@@ -5,6 +5,7 @@
 // Put all onload AJAX calls here, and event listeners
 
 $(document).ready(function() {
+
     // On page-load AJAX Example
     $.ajax({
         type: 'get',            //Request type
@@ -48,6 +49,7 @@ $(document).ready(function() {
         },
         success: function(data) { 
             console.log("data size of file log table: "+data.length);      
+
             
             //$("#tableID").append("<tr>" data "")
 
@@ -139,9 +141,12 @@ $(document).ready(function() {
             /* drop down for edit title and description */ 
             var editDropDown = document.getElementById("editTitleAndDesc");
 
+            /* drop down for adding shape to svg */ 
+            var addShapeDropDown = document.getElementById("addShape");
+
 
             for (var i in data) {
-                var option = document.createElement("option");
+                let option = document.createElement("option");
                 option.value = data[i].fileName;
                 option.text = data[i].fileName;
                 dropDownContent.add(option);
@@ -149,10 +154,18 @@ $(document).ready(function() {
 
                 /* add to edit drop down to edit title & description later*/
             for (var i in data) {
-                var option = document.createElement("option");
+                let option = document.createElement("option");
                 option.value = data[i].fileName;
                 option.text = data[i].fileName;
                 editDropDown.add(option);
+            }
+
+            /* adding to addShape drop down to add component to svg later*/
+            for (var i in data) {
+                let option = document.createElement("option");
+                option.value = data[i].fileName;
+                option.text = data[i].fileName;
+                addShapeDropDown.add(option);
             }
 
             
@@ -554,18 +567,18 @@ $(document).ready(function() {
     function update2(drpdwn) {
                 
         globalCurVal = drpdwn.currentTarget.value;
-        console.log("Selected item : "+globalCurVal); 
-
-        /* drop downdaki elementi aldıktan sonra title ve desc ile post et gerisi kağıtta yazıyo (createNewSVGobject benzeri) */
+        console.log("Selected item : "+globalCurVal);
+        
+        let bttn=document.getElementById("editTitle&DescBttn");
+        bttn.innerHTML = globalCurVal;
         
     }
-    $('#editTitleDescForm').submit(function(e){              
-        console.log("Editing Filename and Desc of "+globalCurVal); 
 
+    $('#editTitleDescForm').submit(function(e){      
+
+        console.log("Editing Title and Desc of "+globalCurVal); 
         e.preventDefault();
-        //Pass data to the Ajax call, so it gets passed to the server
         $.ajax({
-            //Create an object for connecting to another waypoint
 
             type: 'post',
             dataType: 'json',
@@ -611,4 +624,100 @@ $(document).ready(function() {
             }
         });
     });
+
+
+    var selectedSVGtoAddShape = "";
+    document.getElementById('addShape').addEventListener('change', update3, true);
+
+    function update3(drpdwn) {
+                
+        selectedSVGtoAddShape = drpdwn.currentTarget.value;
+        console.log("Selected item : "+selectedSVGtoAddShape);
+        
+        let shape_bttn=document.getElementById("addShapeBttn");
+        shape_bttn.innerHTML = selectedSVGtoAddShape;
+        
+    }
+
+    $('#shapeFormRect').submit(function(e){      
+        console.log("add Rect button clicked!");
+                
+        e.preventDefault();
+        $.ajax({
+
+            type: 'post',
+            dataType: 'json',
+            url: '/addRectangle',
+            data: { 
+                fileName: selectedSVGtoAddShape,
+                x: $('#rectX').val(),
+                y: $('#rectY').val(),
+                height: $('#rect_H').val(),
+                width: $('#rect_W').val(),
+                units: $('#rect_unit').val()
+            },
+            success: function (data) {
+                console.log(data);
+            },
+            fail: function(error) {
+                console.log("Error adding component!");
+                console.log(error);
+            }
+            
+        });
+    });
+
+    $('#shapeFormCircle').submit(function(e){      
+        console.log("add Circle button clicked!");
+                
+        e.preventDefault();
+        $.ajax({
+
+            type: 'post',
+            dataType: 'json',
+            url: '/addCircle',
+            data: { 
+                fileName: selectedSVGtoAddShape,
+                cx: $('#circleX').val(),
+                cy: $('#circleY').val(),
+                r: $('#circle_R').val(),
+                units: $('#circle_unit').val()
+            },
+            success: function (data) {
+                console.log(data);
+            },
+            fail: function(error) {
+                console.log("Error adding component!");
+                console.log(error);
+            }
+            
+        });
+    });
+
+    $('#shapeFormPath').submit(function(e){      
+        console.log("add Path button clicked!");
+                
+        e.preventDefault();
+        $.ajax({
+
+            type: 'post',
+            dataType: 'json',
+            url: '/addPath',
+            data: { 
+                fileName: selectedSVGtoAddShape,
+                d: $('#path_d').val(),
+            },
+            success: function (data) {
+                console.log(data);
+            },
+            fail: function(error) {
+                console.log("Error adding component!");
+                console.log(error);
+            }
+            
+        });
+    });
+
+
+
 });

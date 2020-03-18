@@ -405,6 +405,11 @@ char * showPathAttributes(SVGimage * img);
 char * showGroupAttributes(SVGimage * img);
 void createNewSVGobject(char* fileName, char* newTitle, char* desc);
 void setTitleAndDesc(SVGimage * img, char* newTitle, char* newDesc, char* filename);
+void addRect(SVGimage* img, char* filename, char* rect_x, char* rect_y, char* rect_h, char* rect_w, char* rect_unit);
+void addCircle(SVGimage* img, char* filename, char* circ_cx, char* circ_cy, char* rect_r, char* circ_unit);
+void addPath(SVGimage* img, char* filename, char* newData);
+
+
 
 /* ******************************* List helper functions  - MUST be implemented *************************** */
 

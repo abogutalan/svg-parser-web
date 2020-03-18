@@ -2830,3 +2830,51 @@ char * showGroupAttributes(SVGimage * img) {
 
 }
 
+void addRect(SVGimage* img, char* filename, char* rect_x, char* rect_y, char* rect_h, char* rect_w, char* rect_unit) {
+
+    Rectangle * rect = malloc(sizeof(Rectangle));
+    rect->x = atof(rect_x);
+    rect->y = atof(rect_y);
+    rect->width = atof(rect_h);
+    rect->height = atof(rect_w);
+    strcpy(rect->units,rect_unit);
+    printf("unit: %s\n",rect->units);
+    printf("len: %ld\n",strlen(rect->units));
+
+    rect->otherAttributes = initializeList(&attributeToString, &deleteAttribute, &compareAttributes);
+
+    addComponent(img, RECT, (void*)rect);
+
+    writeSVGimage(img, filename);
+
+}
+
+void addCircle(SVGimage* img, char* filename, char* circ_cx, char* circ_cy, char* rect_r, char* circ_unit) {
+
+    Circle * circ = malloc(sizeof(Circle));
+    circ->cx = atof(circ_cx);
+    circ->cy = atof(circ_cy);
+    circ->r = atof(rect_r);
+    strcpy(circ->units,circ_unit);
+
+    circ->otherAttributes = initializeList(&attributeToString, &deleteAttribute, &compareAttributes);
+
+    addComponent(img, CIRC, (void*)circ);
+
+    writeSVGimage(img, filename);
+
+}
+
+void addPath(SVGimage* img, char* filename, char* newData) {
+
+    Path * path = malloc(sizeof(Path));
+    path->data = newData;
+
+    path->otherAttributes = initializeList(&attributeToString, &deleteAttribute, &compareAttributes);
+
+    addComponent(img, PATH, (void*)path);
+
+    writeSVGimage(img, filename);
+
+}
+

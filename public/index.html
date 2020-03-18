@@ -154,7 +154,7 @@
 
     <!-- Drop Down List -->   
 <div class="dropdown">
-    <button class="dropbtn">Dropdown to edit Title & Desc</button>
+    <button id="editTitle&DescBttn" class="dropbtn">Dropdown to edit Title & Desc</button>
     <select id="editTitleAndDesc" class="dropdown-content">
         <option value="None">-- Select --</option>
     </select>
@@ -199,7 +199,85 @@
     </form>
 
 
+    <p></p>
 
+    <hr>
+        <div class="myHeaders" id="creatingNewSVG">Adding Shape</div>
+    <hr>
+
+    <!-- Drop Down List -->   
+<div class="dropdown">
+    <button id="addShapeBttn" class="dropbtn">Dropdown to add Shape</button>
+    <select id="addShape" class="dropdown-content">
+        <option value="None">-- Select --</option>
+    </select>
+</div>
+
+    <hr>
+        <div class="shapeHeaders" id="creatingNewSVG">Rectangle</div>
+    <hr>
+
+        <div class="form-popup" id="shapeFormRect">
+            <form action="" class="form-container" id='shapeFormRect'>
+                
+                <label class="addShape" for="rectX"><b>x:</b></label>
+                <input class="addShape" type="text" id="rectX" placeholder="Rectangle->x" name="rectX" required>
+    
+                <label class="addShape" for="rectY"><b>y:</b></label>
+                <input class="addShape" type="text" id="rectY" placeholder="Rectangle->y" name="rectY" required>
+            
+                <label class="addShape" for="rect_H"><b>height:</b></label>
+                <input class="addShape" type="text" id="rect_H" placeholder="Rectangle->height" name="rect_H" required>
+                
+                <label class="addShape" for="rect_W"><b>width:</b></label>
+                <input class="addShape" type="text" id="rect_W" placeholder="Rectangle->width" name="rect_W" required>
+
+                <label class="addShape" for="rect_unit"><b>Units:</b></label>
+                <input class="addShape" type="text" id="rect_unit" placeholder="Rectangle->units:" name="rect_unit">
+
+                <input type='submit' value="Add Rectangle" id="addRectangle" class="btn btn-secondary"></input>
+            </form>
+        </div>
+
+    <hr>
+        <div class="shapeHeaders" id="creatingNewSVG">Circle</div>
+    <hr>
+
+        <div class="form-popup" id="shapeFormCircle">
+            <form action="" class="form-container" id='shapeFormCircle'>
+                
+                <label class="addShape" for="circleX"><b>cx:</b></label>
+                <input class="addShape" type="text" id="circleX" placeholder="Circle->x" name="circleX" required>
+    
+                <label class="addShape" for="circleY"><b>cy:</b></label>
+                <input class="addShape" type="text" id="circleY" placeholder="Circle->y" name="circleY" required>
+            
+                <label class="addShape" for="circle_R"><b>radius:</b></label>
+                <input class="addShape" type="text" id="circle_R" placeholder="Circle->r" name="circle_R" required>
+                
+                <label class="addShape" for="circle_unit"><b>Units:</b></label>
+                <input class="addShape" type="text" id="circle_unit" placeholder="Circle->units:" name="circle_unit">
+
+                <input type='submit' value="Add Circle" id="addCircle" class="btn btn-secondary"></input>
+            </form>
+        </div>
+
+    <hr>
+        <div class="shapeHeaders" id="creatingNewSVG">Path</div>
+    <hr>
+
+        <div class="form-popup" id="shapeFormPath">
+            <form action="" class="form-container" id='shapeFormPath'>
+                
+                <label class="addShape" for="path_d"><b>d:</b></label>
+                <input class="addShape" type="text" id="path_d" placeholder="Path->d" name="path_d" maxlength="64" required>
+    
+                <input type='submit' value="Add Path" id="addPath" class="btn btn-secondary"></input>
+            </form>
+        </div>
+
+
+    <p></p>
     <footer>Abdullah Ogutalan * 1109732 * aogutala@uoguelph.ca </footer>
 
     <!-- Leave me at the bottom of body -->

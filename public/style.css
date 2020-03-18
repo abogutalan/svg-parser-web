@@ -122,6 +122,12 @@ text-align: center;
   text-transform: uppercase;
   color: #4CAF50;
 }
+.form-popup {
+    display: block;
+}
+.shapeHeaders {
+    font-weight: 900;
+}
 @media(max-width: 900px) {
     html {
         font-size: 14px !important;

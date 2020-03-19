@@ -121,9 +121,18 @@
 
    
 
-    <!-- editing attributes -->
-    
+<hr>
+    <h3 class="myHeaders" id="creatingNewSVG">Edit Attributes</h3>
+<hr>
+    <!-- Drop Down List -->   
+<div class="dropdown">
+    <button id="editAttrBttn" class="dropbtn">Dropdown to edit attributes</button>
+    <select id="editAttr" class="dropdown-content">
+        <option value="None">-- Select --</option>
+    </select>
+</div>
 
+    <!-- editing attributes -->
 
     <hr>
         <div id="editName">Editing name</div>
@@ -149,7 +158,7 @@
     <p></p>
 
     <hr>
-        <div class="myHeaders" id="creatingNewSVG">Edit Title And Description</div>
+        <h3 class="myHeaders" id="creatingNewSVG">Edit Title And Description</h3>
     <hr>
 
     <!-- Drop Down List -->   
@@ -159,7 +168,6 @@
         <option value="None">-- Select --</option>
     </select>
 </div>
-
 
     
     <form ref='editTitleDescForm'
@@ -178,8 +186,9 @@
 
 <p></p>
 
+
     <hr>
-        <div class="myHeaders" id="creatingNewSVG">Creating New SVG Object</div>
+        <h3 class="myHeaders" id="creatingNewSVG">Creating New SVG Object</h3>
     <hr>
     <form ref='newSVGForm'
           id='newSVGForm'>
@@ -202,7 +211,7 @@
     <p></p>
 
     <hr>
-        <div class="myHeaders" id="creatingNewSVG">Adding Shape</div>
+        <h3 class="myHeaders" id="creatingNewSVG">Adding Shape</h3>
     <hr>
 
     <!-- Drop Down List -->   
@@ -214,23 +223,23 @@
 </div>
 
     <hr>
-        <div class="shapeHeaders" id="creatingNewSVG">Rectangle</div>
+        <h5 class="shapeHeaders" id="creatingNewSVG">Rectangle</h5>
     <hr>
 
         <div class="form-popup" id="shapeFormRect">
             <form action="" class="form-container" id='shapeFormRect'>
                 
                 <label class="addShape" for="rectX"><b>x:</b></label>
-                <input class="addShape" type="text" id="rectX" placeholder="Rectangle->x" name="rectX" required>
+                <input class="addShape" type="number" id="rectX" placeholder="Rectangle->x" name="rectX" min="1" required>
     
                 <label class="addShape" for="rectY"><b>y:</b></label>
-                <input class="addShape" type="text" id="rectY" placeholder="Rectangle->y" name="rectY" required>
+                <input class="addShape" type="number" id="rectY" placeholder="Rectangle->y" name="rectY" min="1" required>
             
                 <label class="addShape" for="rect_H"><b>height:</b></label>
-                <input class="addShape" type="text" id="rect_H" placeholder="Rectangle->height" name="rect_H" required>
+                <input class="addShape" type="number" id="rect_H" placeholder="Rectangle->height" name="rect_H" min="1" required>
                 
                 <label class="addShape" for="rect_W"><b>width:</b></label>
-                <input class="addShape" type="text" id="rect_W" placeholder="Rectangle->width" name="rect_W" required>
+                <input class="addShape" type="number" id="rect_W" placeholder="Rectangle->width" name="rect_W" min="1" required>
 
                 <label class="addShape" for="rect_unit"><b>Units:</b></label>
                 <input class="addShape" type="text" id="rect_unit" placeholder="Rectangle->units:" name="rect_unit">
@@ -240,20 +249,20 @@
         </div>
 
     <hr>
-        <div class="shapeHeaders" id="creatingNewSVG">Circle</div>
+        <h5 class="shapeHeaders" id="creatingNewSVG">Circle</h5>
     <hr>
 
         <div class="form-popup" id="shapeFormCircle">
             <form action="" class="form-container" id='shapeFormCircle'>
                 
                 <label class="addShape" for="circleX"><b>cx:</b></label>
-                <input class="addShape" type="text" id="circleX" placeholder="Circle->x" name="circleX" required>
+                <input class="addShape" type="number" id="circleX" placeholder="Circle->x" name="circleX" min="1" required>
     
                 <label class="addShape" for="circleY"><b>cy:</b></label>
-                <input class="addShape" type="text" id="circleY" placeholder="Circle->y" name="circleY" required>
+                <input class="addShape" type="number" id="circleY" placeholder="Circle->y" name="circleY" min="1" required>
             
                 <label class="addShape" for="circle_R"><b>radius:</b></label>
-                <input class="addShape" type="text" id="circle_R" placeholder="Circle->r" name="circle_R" required>
+                <input class="addShape" type="number" id="circle_R" placeholder="Circle->r" name="circle_R" min="1" required>
                 
                 <label class="addShape" for="circle_unit"><b>Units:</b></label>
                 <input class="addShape" type="text" id="circle_unit" placeholder="Circle->units:" name="circle_unit">
@@ -263,7 +272,7 @@
         </div>
 
     <hr>
-        <div class="shapeHeaders" id="creatingNewSVG">Path</div>
+        <h5 class="shapeHeaders" id="creatingNewSVG">Path</h5>
     <hr>
 
         <div class="form-popup" id="shapeFormPath">

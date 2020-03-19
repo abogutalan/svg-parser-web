@@ -2056,6 +2056,36 @@ void updateGroupAttributes(List * groups, Attribute * newAttribute, int elemInde
     else deleteAttribute(newAttribute);
 }
 
+void editAttributes(SVGimage* image, char* elemType, int elemIndex, char* newName, char* newVal, char* filename) {
+
+    Attribute * newAttribute = (Attribute *)malloc(sizeof(Attribute));   
+            
+    newAttribute->name = malloc(sizeof(char) * (strlen(newName) + 1));
+    newAttribute->value = malloc(sizeof(char) * (strlen(newVal) + 1));
+    strcpy(newAttribute->name, newName);
+    strcpy(newAttribute->value, newVal);
+
+    if(strcmp("Rectangle", elemType) == 0) {
+        setAttribute(image, RECT, elemIndex, newAttribute);
+    }
+    else if(strcmp("Circle", elemType) == 0) {
+        setAttribute(image, CIRC, elemIndex, newAttribute);
+    }
+    else if(strcmp("Path", elemType) == 0) {
+        setAttribute(image, PATH, elemIndex, newAttribute);
+    }
+    else if(strcmp("Group", elemType) == 0) {
+        setAttribute(image, GROUP, elemIndex, newAttribute);
+    }
+    else
+    {
+        printf("Element type does not match with any shape to edit attributes!");
+        deleteAttribute(newAttribute);
+    }
+    
+    writeSVGimage(image, filename);
+}
+
 void setAttribute(SVGimage* image, elementType elemType, int elemIndex, Attribute* newAttribute) {
 
     if ( image == NULL ) {

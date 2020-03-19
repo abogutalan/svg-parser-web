@@ -114,6 +114,9 @@ $(document).ready(function() {
         }
     });
 
+
+    var fileNameToEditAttr = "";
+
     /* *** SVG View Panel *** */
     $.ajax({
         type: 'get',
@@ -176,10 +179,15 @@ $(document).ready(function() {
                 curVal = dropDownList.currentTarget.value;
                 console.log("selected item : "+curVal); 
 
+                /* edit attr drop down must be empty whenever the svg view panel is being populated again */
+                clearDropDown("editAttr");
+                fileNameToEditAttr = curVal;
+
                 for ( var j in data ) {
     
                     if(data[j].fileName == curVal) {
-                        console.log("item being populated: ", curVal);
+                        console.log("item being populated: ", curVal);                       
+
                         populateSvgViewPanel(data[j]);
                     }
                 }              
@@ -314,6 +322,9 @@ $(document).ready(function() {
         
     }
 
+    /* drop down for edit attributes */ 
+    var editAttrDropDown = document.getElementById("editAttr");
+
     function addRects(table, data) { // selected data from drop down list
 
         for ( var i in data.rects) {
@@ -364,18 +375,17 @@ $(document).ready(function() {
                 
             });
             thirdCell.appendChild(thirdElement);
+
+            /* populate edit attribute drop down */
+            populate_edit_attr_drop_down(firstText);
             
         }        
     }
-    function circleComponent(row) {
-        
-    }
+    
     function addCircles(table, data) {
 
         for ( var i in data.circles) {
             var row = table.insertRow(table.rows.length);
-
-            circleComponent(row);
 
         /* component */
             let firstColumn = row.insertCell(0);
@@ -421,9 +431,13 @@ $(document).ready(function() {
                 
             });
             thirdCell.appendChild(thirdElement);
+
+            /* populate edit attribute drop down */
+            populate_edit_attr_drop_down(firstText);
             
         }        
     }
+    
 
     function addPaths(table, data) {
 
@@ -474,6 +488,9 @@ $(document).ready(function() {
                 
             });
             thirdCell.appendChild(thirdElement);
+
+            /* populate edit attribute drop down */
+            populate_edit_attr_drop_down(firstText);
             
         }        
     }
@@ -526,8 +543,29 @@ $(document).ready(function() {
                 
             });
             thirdCell.appendChild(thirdElement);
+
+            /* populate edit attribute drop down */
+            populate_edit_attr_drop_down(firstText);
             
         }        
+    }
+
+    /* to clear any drop down */
+    function clearDropDown(dropDown_id) {
+
+        var select = document.getElementById(dropDown_id);
+        var length = select.options.length;
+        for (i = length-1; i >= 1; i--) {
+            select.options[i] = null;
+        }
+    }
+
+    function populate_edit_attr_drop_down(firstText) {
+
+        let option = document.createElement("option");
+        option.value = firstText.data;
+        option.text = firstText.data;
+        editAttrDropDown.add(option);
     }
 
 
@@ -549,14 +587,44 @@ $(document).ready(function() {
   
     });
 
+
+    var selected_shape_of_edit_attr = "";
+    document.getElementById('editAttr').addEventListener('change', updateAttribute, true);
+
+    function updateAttribute(drpdwn) {
+                
+        selected_shape_of_edit_attr = drpdwn.currentTarget.value;
+        console.log("Selected item : "+selected_shape_of_edit_attr);
+        
+        let bttn=document.getElementById("editAttrBttn");
+        bttn.innerHTML = selected_shape_of_edit_attr;
+        
+    }
+
     $('#editAttrVal').submit(function(e){
         $('#editName').html("Edit Attr name: "+$('#nameBox').val());
         $('#editValue').html("Edit Attr value: "+$('#valueBox').val());
-        console.log("Edit Attribute element ==> name: " + $('#nameBox').val() + " - value: " + $('#valueBox').val());
+        console.log("Edit Attribute button clicked!");
         e.preventDefault();
         //Pass data to the Ajax call, so it gets passed to the server
         $.ajax({
             //Create an object for connecting to another waypoint
+            type: 'post',
+            dataType: 'json',
+            url: '/editAttr',
+            data: { 
+                attrName: $('#nameBox').val(),
+                attrValue: $('#valueBox').val(),
+                selectedShape: selected_shape_of_edit_attr,
+                filename: fileNameToEditAttr
+            },
+            success: function (data) {
+                console.log(data);
+            },
+            fail: function(error) {
+                console.log("Error editing attribute!");
+                console.log(error);
+            }
             
         });
     });
@@ -592,7 +660,7 @@ $(document).ready(function() {
                 console.log(data);
             },
             fail: function(error) {
-                console.log("Error editing!");
+                console.log("Error editing title and description!");
                 console.log(error);
             }
             
@@ -609,7 +677,7 @@ $(document).ready(function() {
             //Create an object for connecting to another waypoint
             type: 'post',
             dataType: 'json',
-            url: '/edit',
+            url: '/newSVG',
             data: { 
                 title: $('#titleBox').val(),
                 description: $('#descBox').val(),
@@ -619,7 +687,7 @@ $(document).ready(function() {
                 console.log(data);
             },
             fail: function(error) {
-                console.log("Error editing!");
+                console.log("Error creating new SVG image!");
                 console.log(error);
             }
         });

@@ -77,6 +77,7 @@ app.get('/uploads/:name', function(req , res){
 
 let sharedLib = ffi.Library('./libsvgparse', {
       'createValidSVGimage': [ 'pointer', [ 'string', 'string' ] ],
+      'validateSVGimage': [ 'int', [ 'pointer', 'string' ] ],
       'SVGtoJSON': [ 'string', [ 'pointer' ] ],
       'getSVGTitle': [ 'string', [ 'pointer' ] ],
       'getSVGDescription': [ 'string', [ 'pointer' ] ],
@@ -92,7 +93,8 @@ let sharedLib = ffi.Library('./libsvgparse', {
       'setTitleAndDesc': [ 'void', [ 'pointer', 'string', 'string', 'string' ] ],  
       'addRect': [ 'void', [ 'pointer', 'string', 'string', 'string', 'string', 'string', 'string' ] ],      
       'addCircle': [ 'void', [ 'pointer', 'string', 'string', 'string', 'string', 'string' ] ],     
-      'addPath': [ 'void', [ 'pointer', 'string', 'string' ] ]      
+      'addPath': [ 'void', [ 'pointer', 'string', 'string' ] ],
+      'editAttributes': [ 'void', [ 'pointer', 'string', 'int', 'string', 'string', 'string' ] ]      
 
 });
 
@@ -146,8 +148,9 @@ app.get('/uploadedFiles', function(req, res) {
   res.send(myStack);
 });
 
-app.post('/edit', function(req, res) {
+app.post('/editAttr', function(req, res) {
   var output = {};
+  var path;
   
   req.on('data', function(data) {
     data = data.toString();
@@ -156,34 +159,46 @@ app.post('/edit', function(req, res) {
         var tokenizedData = data[i].split("=");
         output[tokenizedData[0]] = tokenizedData[1];
     }
-    /* title */
-    let titleStr = output.title.toString();
-    let titleWords = titleStr.split('+');
-    let title = "";
-    for ( let i = 0; i < titleWords.length; i++){
-      title += titleWords[i] + " ";
+    /* attr name */
+    let nameStr = output.attrName.toString();
+    let nameWords = nameStr.split('+');
+    let name = "";
+    for ( let i = 0; i < nameWords.length; i++){
+      name += nameWords[i];
     }
-    /* decription */
-    let descStr = output.description.toString();
-    let descWords = descStr.split('+');
-    let description = "";
-    for ( let i = 0; i < descWords.length; i++){
-      description += descWords[i] + " ";
+    /* attr value */
+    let valueStr = output.attrValue.toString();
+    let valueWords = valueStr.split('+');
+    let value = "";
+    for ( let i = 0; i < valueWords.length; i++){
+      value += valueWords[i];
     }
-    /* filename */
-    let filename = output.fileName.toString();
+    /* elem_type & index */
+    let selectedShape = output.selectedShape.toString();
+    let words = selectedShape.split('+');
+    let elem_type, index;
+    elem_type = words[0].trim();
+    index = parseInt(words[1]) - +1;
+    // console.log("elem_type : "+elem_type+ " - index: "+ index);
 
-    /* check if file name has .svg extension */
-    let extension = filename.substring(filename.length - +4, filename.length);
-    /* creating new valid SVG */
-    if((".svg" === extension) && (filename.length != 0)) {
-      sharedLib.createNewSVGobject("./uploads/" + filename, title, description);
+    let filename = output.filename.toString();
+    path = "./uploads/"+ filename.toString();
+
+    if(filename.length != 0) {
+      let img = sharedLib.createValidSVGimage(path, "parser/validation/svg.xsd");
+      sharedLib.editAttributes(img, elem_type, index, name, value, path);
+
+      /* check validation */
+      let retVal = sharedLib.validateSVGimage(img, "parser/validation/svg.xsd");
+      if(retVal == 0) {
+        console.log("SVG is invalid after setting attributes!");
+        fs.unlinkSync(path);
+      }
     }
-    else console.log("Invalid extension or empty file name ERROR !");
+    else console.log("File name is empty!");
+
   })
-  
-  // console.log(output); //empty 
-  
+    
   res.redirect('/');
 
 });
@@ -231,6 +246,48 @@ app.post('/editTitleAndDescription', function(req, res) {
 
   })
     
+  res.redirect('/');
+
+});
+
+app.post('/newSVG', function(req, res) {
+  var output = {};
+  
+  req.on('data', function(data) {
+    data = data.toString();
+    data = data.split('&');
+    for (let i = 0; i < data.length; i++) {
+        var tokenizedData = data[i].split("=");
+        output[tokenizedData[0]] = tokenizedData[1];
+    }
+    /* title */
+    let titleStr = output.title.toString();
+    let titleWords = titleStr.split('+');
+    let title = "";
+    for ( let i = 0; i < titleWords.length; i++){
+      title += titleWords[i] + " ";
+    }
+    /* decription */
+    let descStr = output.description.toString();
+    let descWords = descStr.split('+');
+    let description = "";
+    for ( let i = 0; i < descWords.length; i++){
+      description += descWords[i] + " ";
+    }
+    /* filename */
+    let filename = output.fileName.toString();
+
+    /* check if file name has .svg extension */
+    let extension = filename.substring(filename.length - +4, filename.length);
+    /* creating new valid SVG */
+    if((".svg" === extension) && (filename.length != 0)) {
+      sharedLib.createNewSVGobject("./uploads/" + filename, title, description);
+    }
+    else console.log("Invalid extension or empty file name ERROR !");
+  })
+  
+  // console.log(output); //empty 
+  
   res.redirect('/');
 
 });

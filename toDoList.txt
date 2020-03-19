@@ -1,0 +1,14 @@
+> If there are no .svg files on the server, the File Log Panel must display an appropriate message (See Section 3).
+
+> If the server request for the upload is unsuccessful - i.e. server returns some sort of error - then go no further. The File Log Panel
+would remain unchanged. Display the error in an alert.
+
+> If the file you are trying to
+upload already exists on the server, don't overwrite it, and display an appropriate message in the an alert
+
+
+
+
+
+> when drop down clicked change the text of itself
+> if no file name is selected give an alert()

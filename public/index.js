@@ -627,7 +627,10 @@ $(document).ready(function() {
             }
             
         });
+        location.reload(true);
+
     });
+
 
     var globalCurVal = "";
     document.getElementById('editTitleAndDesc').addEventListener('change', update2, true);
@@ -665,6 +668,7 @@ $(document).ready(function() {
             }
             
         });
+        location.reload(true);
     });
 
     
@@ -691,6 +695,7 @@ $(document).ready(function() {
                 console.log(error);
             }
         });
+        location.reload(true);
     });
 
 
@@ -733,6 +738,7 @@ $(document).ready(function() {
             }
             
         });
+        location.reload(true);
     });
 
     $('#shapeFormCircle').submit(function(e){      
@@ -760,6 +766,7 @@ $(document).ready(function() {
             }
             
         });
+        location.reload(true);
     });
 
     $('#shapeFormPath').submit(function(e){      
@@ -784,6 +791,7 @@ $(document).ready(function() {
             }
             
         });
+        location.reload(true);
     });
 
 

@@ -194,6 +194,8 @@ app.post('/editAttr', function(req, res) {
         console.log("SVG is invalid after setting attributes!");
         fs.unlinkSync(path);
       }
+
+
     }
     else console.log("File name is empty!");
 

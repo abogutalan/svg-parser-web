@@ -147,6 +147,9 @@ $(document).ready(function() {
             /* drop down for adding shape to svg */ 
             var addShapeDropDown = document.getElementById("addShape");
 
+            /* drop down for scaling Shape */ 
+            var scaleShapeDropDown = document.getElementById("scaleShape");
+
 
             for (var i in data) {
                 let option = document.createElement("option");
@@ -169,6 +172,14 @@ $(document).ready(function() {
                 option.value = data[i].fileName;
                 option.text = data[i].fileName;
                 addShapeDropDown.add(option);
+            }
+
+            /* adding to scaleShape drop down to add component to svg later*/
+            for (var i in data) {
+                let option = document.createElement("option");
+                option.value = data[i].fileName;
+                option.text = data[i].fileName;
+                scaleShapeDropDown.add(option);
             }
 
             
@@ -793,6 +804,75 @@ $(document).ready(function() {
         });
         location.reload(true);
     });
+
+
+    /* scale shape */
+
+    var selectedSVGtoScaleShape = "";
+    document.getElementById('scaleShape').addEventListener('change', scaling, true);
+
+    function scaling(drpdwn) {
+                
+        selectedSVGtoScaleShape = drpdwn.currentTarget.value;
+        console.log("Selected item : "+selectedSVGtoScaleShape);
+        
+        let shape_bttn=document.getElementById("scaleShapeBttn");
+        shape_bttn.innerHTML = selectedSVGtoScaleShape;
+        
+    }
+
+    $('#scaleRectForm').submit(function(e){      
+        console.log("shape Rect button clicked!");
+                
+        e.preventDefault();
+        $.ajax({
+
+            type: 'post',
+            dataType: 'json',
+            url: '/scaleRectangle',
+            data: { 
+                fileName: selectedSVGtoScaleShape,
+                rectFactor: $('#scaleRect').val(),
+                
+            },
+            success: function (data) {
+                console.log(data);
+            },
+            fail: function(error) {
+                console.log("Error scaling Shape!");
+                console.log(error);
+            }
+            
+        });
+        // location.reload(true);
+    });
+
+    $('#scaleCircleForm').submit(function(e){      
+        console.log("shape Circle button clicked!");
+                
+        e.preventDefault();
+        $.ajax({
+
+            type: 'post',
+            dataType: 'json',
+            url: '/scaleCircle',
+            data: { 
+                fileName: selectedSVGtoScaleShape,
+                circleFactor: $('#scaleCirc').val(),
+                
+            },
+            success: function (data) {
+                console.log(data);
+            },
+            fail: function(error) {
+                console.log("Error scaling Shape!");
+                console.log(error);
+            }
+            
+        });
+        // location.reload(true);
+    });
+
 
 
 

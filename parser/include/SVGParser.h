@@ -408,8 +408,9 @@ void setTitleAndDesc(SVGimage * img, char* newTitle, char* newDesc, char* filena
 void addRect(SVGimage* img, char* filename, char* rect_x, char* rect_y, char* rect_h, char* rect_w, char* rect_unit);
 void addCircle(SVGimage* img, char* filename, char* circ_cx, char* circ_cy, char* rect_r, char* circ_unit);
 void addPath(SVGimage* img, char* filename, char* newData);
-void editAttributes(SVGimage* image, char* elemType, int elemIndex, char* newName, char* newVal, char* filename);
-
+char* editAttributes(SVGimage* image, char* elemType, int elemIndex, char* newName, char* newVal, char* filename);
+char* scaleRectangle(SVGimage* img, char* filename, int scaleFactor);
+char* scaleCircle(SVGimage* img, char* filename, int scaleFactor);
 
 /* ******************************* List helper functions  - MUST be implemented *************************** */
 

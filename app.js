@@ -94,8 +94,10 @@ let sharedLib = ffi.Library('./libsvgparse', {
       'addRect': [ 'void', [ 'pointer', 'string', 'string', 'string', 'string', 'string', 'string' ] ],      
       'addCircle': [ 'void', [ 'pointer', 'string', 'string', 'string', 'string', 'string' ] ],     
       'addPath': [ 'void', [ 'pointer', 'string', 'string' ] ],
-      'editAttributes': [ 'void', [ 'pointer', 'string', 'int', 'string', 'string', 'string' ] ]      
-
+      'editAttributes': [ 'string', [ 'pointer', 'string', 'int', 'string', 'string', 'string' ] ],
+      'scaleRectangle': [ 'string', [ 'pointer', 'string', 'int' ] ],
+      'scaleCircle': [ 'string', [ 'pointer', 'string', 'int' ] ]
+      
 });
 
 /* file log table */
@@ -148,6 +150,77 @@ app.get('/uploadedFiles', function(req, res) {
   res.send(myStack);
 });
 
+
+/* svg view panel */
+app.get('/svgView', function(req, res){
+  // var fN = req.query.fileName;  // -> getting file name from index.js
+  // console.log("++++file name :::: "+fN);
+  let stack = [];
+  let path;
+  var fs = require('fs');
+  var files = fs.readdirSync("./uploads/");
+
+  for (var i in files) {
+
+    path = "./uploads/"+ files[i];
+
+    var panelSVGimage = sharedLib.createValidSVGimage(path, "parser/validation/svg.xsd");
+
+    var svgTitle = sharedLib.getSVGTitle(panelSVGimage);
+
+    /* if it is a valid SVG */
+    if ( svgTitle !== "Invalid SVG!") {
+      var svgDesc = sharedLib.getSVGDescription(panelSVGimage);
+
+
+      let rects = sharedLib.mySVGToRectJSON(panelSVGimage); 
+      let circles = sharedLib.mySVGToCircJSON(panelSVGimage);
+      let paths = sharedLib.mySVGToPathJSON(panelSVGimage);
+      let groups = sharedLib.mySVGToGroupJSON(panelSVGimage);
+      
+    let rectAttr = sharedLib.showRectAttributes(panelSVGimage);
+    let circleAttr = sharedLib.showCircAttributes(panelSVGimage);  
+    let pathAttr = sharedLib.showPathAttributes(panelSVGimage); 
+    let groupAttr = sharedLib.showGroupAttributes(panelSVGimage);  
+    rectAttr = JSON.parse(rectAttr);
+    circleAttr = JSON.parse(circleAttr);
+    pathAttr = JSON.parse(pathAttr);
+    groupAttr = JSON.parse(groupAttr);
+
+    // console.log(pathAttr);
+  
+      rects = JSON.parse(rects);
+      circles = JSON.parse(circles);
+      paths = JSON.parse(paths);
+      groups = JSON.parse(groups);      
+  
+  
+      let svgViewJSON = {
+        fileName: files[i],
+        desc: svgDesc.toString(),
+        title: svgTitle.toString(),
+        rects: rects,
+        circles: circles,
+        paths: paths,
+        groups: groups,
+        otherAttrOfRects: rectAttr,
+        otherAttrOfCircs: circleAttr,
+        otherAttrOfPaths: pathAttr,
+        otherAttrOfGroups: groupAttr
+      };
+      stack.push(svgViewJSON);
+    }
+
+    
+  }
+
+  // console.log("JSON to svg view panel is: ");
+ // console.log(stack); 
+
+  res.send(stack);
+
+});
+
 app.post('/editAttr', function(req, res) {
   var output = {};
   var path;
@@ -186,7 +259,8 @@ app.post('/editAttr', function(req, res) {
 
     if(filename.length != 0) {
       let img = sharedLib.createValidSVGimage(path, "parser/validation/svg.xsd");
-      sharedLib.editAttributes(img, elem_type, index, name, value, path);
+      let isEditedAttribute = sharedLib.editAttributes(img, elem_type, index, name, value, path);
+      console.log(isEditedAttribute);
 
       /* check validation */
       let retVal = sharedLib.validateSVGimage(img, "parser/validation/svg.xsd");
@@ -307,41 +381,19 @@ app.post('/addRectangle', function(req, res) {
         output[tokenizedData[0]] = tokenizedData[1];
     }
     /* rect->x */
-    let xStr = output.x.toString();
-    let xWords = xStr.split('+');
-    let x = "";
-    for ( let i = 0; i < xWords.length; i++){
-      x += xWords[i] + " ";
-    }
+    let x = output.x;
+
     /* rect->y */
-    let yStr = output.y.toString();
-    let yWords = yStr.split('+');
-    let y = "";
-    for ( let i = 0; i < yWords.length; i++){
-      y += yWords[i] + " ";
-    }
+    let y = output.y;
 
     /* rect->height */
-    let heightStr = output.height.toString();
-    let heightWords = heightStr.split('+');
-    let height = "";
-    for ( let i = 0; i < heightWords.length; i++){
-      height += heightWords[i] + " ";
-    }
+    let height = output.height;
+
     /* rect->width */
-    let widthStr = output.width.toString();
-    let widthWords = widthStr.split('+');
-    let width = "";
-    for ( let i = 0; i < widthWords.length; i++){
-      width += widthWords[i] + " ";
-    }
+    let width = output.width;
+
     /* rect->units */
-    let unitsStr = output.units.toString();
-    let unitsWords = unitsStr.split('+');
-    let units = "";
-    for ( let i = 0; i < unitsWords.length; i++){
-      units += unitsWords[i] + " ";
-    }
+    let unit = output.units.toString().trim();
 
     let filename = output.fileName.toString();
     
@@ -350,7 +402,7 @@ app.post('/addRectangle', function(req, res) {
 
     if(filename.length != 0) {
       let img = sharedLib.createValidSVGimage(path, "parser/validation/svg.xsd");
-      sharedLib.addRect(img, path, x, y, height, width, units);
+      sharedLib.addRect(img, path, x, y, height, width, unit);
     }
     else console.log("File name is empty!");
 
@@ -373,36 +425,17 @@ app.post('/addCircle', function(req, res) {
         output[tokenizedData[0]] = tokenizedData[1];
     }
     /* circle->cx */
-    let xStr = output.cx.toString();
-    let xWords = xStr.split('+');
-    let cx = "";
-    for ( let i = 0; i < xWords.length; i++){
-      cx += xWords[i] + " ";
-    }
+    let cx = output.cx;
+
     /* circle->cy */
-    let yStr = output.cy.toString();
-    let yWords = yStr.split('+');
-    let cy = "";
-    for ( let i = 0; i < yWords.length; i++){
-      cy += yWords[i] + " ";
-    }
+    let cy = output.cy;
 
     /* circle->r */
-    let r_Str = output.r.toString();
-    let r_Words = r_Str.split('+');
-    let r = "";
-    for ( let i = 0; i < r_Words.length; i++){
-      r += r_Words[i] + " ";
-    }
+    let r = output.r;
     
     /* circle->units */
-    let unitsStr = output.units.toString();
-    let unitsWords = unitsStr.split('+');
-    let units = "";
-    for ( let i = 0; i < unitsWords.length; i++){
-      units += unitsWords[i] + " ";
-    }
-
+    let unit = output.units.toString().trim();
+    
     let filename = output.fileName.toString();
     
     path = "./uploads/"+ filename.toString();
@@ -410,7 +443,7 @@ app.post('/addCircle', function(req, res) {
 
     if(filename.length != 0) {
       let img = sharedLib.createValidSVGimage(path, "parser/validation/svg.xsd");
-      sharedLib.addCircle(img, path, cx, cy, r, units);
+      sharedLib.addCircle(img, path, cx, cy, r, unit);
     }
     else console.log("File name is empty!");
 
@@ -456,78 +489,70 @@ app.post('/addPath', function(req, res) {
 
 });
 
-
-
-
-/* svg view panel */
-app.get('/svgView', function(req, res){
-  // var fN = req.query.fileName;  // -> getting file name from index.js
-  // console.log("++++file name :::: "+fN);
-  let stack = [];
-  let path;
-  var fs = require('fs');
-  var files = fs.readdirSync("./uploads/");
-
-  for (var i in files) {
-
-    path = "./uploads/"+ files[i];
-
-    var panelSVGimage = sharedLib.createValidSVGimage(path, "parser/validation/svg.xsd");
-
-    var svgTitle = sharedLib.getSVGTitle(panelSVGimage);
-
-    /* if it is a valid SVG */
-    if ( svgTitle !== "Invalid SVG!") {
-      var svgDesc = sharedLib.getSVGDescription(panelSVGimage);
-
-
-      let rects = sharedLib.mySVGToRectJSON(panelSVGimage); 
-      let circles = sharedLib.mySVGToCircJSON(panelSVGimage);
-      let paths = sharedLib.mySVGToPathJSON(panelSVGimage);
-      let groups = sharedLib.mySVGToGroupJSON(panelSVGimage);
-      
-    let rectAttr = sharedLib.showRectAttributes(panelSVGimage);
-    let circleAttr = sharedLib.showCircAttributes(panelSVGimage);  
-    let pathAttr = sharedLib.showPathAttributes(panelSVGimage); 
-    let groupAttr = sharedLib.showGroupAttributes(panelSVGimage);  
-    rectAttr = JSON.parse(rectAttr);
-    circleAttr = JSON.parse(circleAttr);
-    pathAttr = JSON.parse(pathAttr);
-    groupAttr = JSON.parse(groupAttr);
-
-    // console.log(pathAttr);
+app.post('/scaleRectangle', function(req, res) {
+  var output = {};
+  var path;
   
-      rects = JSON.parse(rects);
-      circles = JSON.parse(circles);
-      paths = JSON.parse(paths);
-      groups = JSON.parse(groups);      
-  
-  
-      let svgViewJSON = {
-        fileName: files[i],
-        desc: svgDesc.toString(),
-        title: svgTitle.toString(),
-        rects: rects,
-        circles: circles,
-        paths: paths,
-        groups: groups,
-        otherAttrOfRects: rectAttr,
-        otherAttrOfCircs: circleAttr,
-        otherAttrOfPaths: pathAttr,
-        otherAttrOfGroups: groupAttr
-      };
-      stack.push(svgViewJSON);
+  req.on('data', function(data) {
+    data = data.toString();
+    data = data.split('&');
+    for (let i = 0; i < data.length; i++) {
+        var tokenizedData = data[i].split("=");
+        output[tokenizedData[0]] = tokenizedData[1];
     }
 
+    let scaleFactor = parseInt(output.rectFactor);
     
-  }
+    let filename = output.fileName.toString();
+    
+    path = "./uploads/"+ filename.toString();
 
-  // console.log("JSON to svg view panel is: ");
- // console.log(stack); 
+    if(filename.length != 0) {
+      let img = sharedLib.createValidSVGimage(path, "parser/validation/svg.xsd");
+      let retScaleRect = sharedLib.scaleRectangle(img, path, scaleFactor);
+      console.log(retScaleRect);
+    }
+    else console.log("File name is empty!");
 
-  res.send(stack);
+  })
+    
+  res.redirect('/');
 
 });
+
+app.post('/scaleCircle', function(req, res) {
+  var output = {};
+  var path;
+  
+  req.on('data', function(data) {
+    data = data.toString();
+    data = data.split('&');
+    for (let i = 0; i < data.length; i++) {
+        var tokenizedData = data[i].split("=");
+        output[tokenizedData[0]] = tokenizedData[1];
+    }
+    
+    let scaleFactor = parseInt(output.circleFactor);
+    console.log("test circ factor: "+ scaleFactor);
+    
+    let filename = output.fileName.toString();
+    
+    path = "./uploads/"+ filename.toString();
+
+    if(filename.length != 0) {
+      let img = sharedLib.createValidSVGimage(path, "parser/validation/svg.xsd");
+      let retScaleCirc = sharedLib.scaleCircle(img, path, scaleFactor);
+      console.log(retScaleCirc);
+    }
+    else console.log("File name is empty!");
+
+  })
+    
+  res.redirect('/');
+
+});
+
+
 
 //Sample endpoint
 app.get('/someendpoint', function(req , res){

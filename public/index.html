@@ -111,7 +111,7 @@
 <div class="otherAttributesClass"> 
   <table id="otherAttrTable">
     <tr>
-      <th>Attributes</th>
+      <th>Click one of the item in Other Attributes column to see the details!</th>
       
     </tr>
   </table>
@@ -144,11 +144,11 @@
     <form ref='editAttrVal'
           id='editAttrVal'>
             <div class="form-group">
-                <input type="text" class="form-control" id="nameBox" value="name" placeholder="Placeholder">
+                <input type="text" class="form-control" id="nameBox" placeholder="name">
             </div>
             
             <div class="form-group">
-                <input type="text" class="form-control" id="valueBox" value="value" placeholder="Placeholder">
+                <input type="text" class="form-control" id="valueBox" placeholder="value">
             </div>
             <div class="form-group">
                 <input type='submit' value="Edit Attribute" class="btn btn-secondary">
@@ -174,10 +174,10 @@
           id='editTitleDescForm'>
                         
             <div class="form-group">
-                <input type="text" class="form-control" id="editTitleBox" value="title" placeholder="Placeholder" maxlength="255" required>
+                <input type="text" class="form-control" id="editTitleBox" placeholder="Title" maxlength="255" required>
             </div>
             <div class="form-group">
-                <input type="text" class="form-control" id="editDescBox" value="description" placeholder="Placeholder" maxlength="255" required>
+                <input type="text" class="form-control" id="editDescBox" placeholder="Description" maxlength="255" required>
             </div>
             <div class="form-group">
                 <input type='submit' value="Click to Edit" class="btn btn-secondary">
@@ -282,6 +282,49 @@
                 <input class="addShape" type="text" id="path_d" placeholder="Path->d" name="path_d" maxlength="64" required>
     
                 <input type='submit' value="Add Path" id="addPath" class="btn btn-secondary"></input>
+            </form>
+        </div>
+
+
+    <p></p>
+
+    <hr>
+        <h3 class="myHeaders" id="scalingShapesHeader">Scale Shapes</h3>
+    <hr>
+
+    <!-- Drop Down List -->   
+<div class="dropdown">
+    <button id="scaleShapeBttn" class="dropbtn">Dropdown to scale Shape</button>
+    <select id="scaleShape" class="dropdown-content">
+        <option value="None">-- Select --</option>
+    </select>
+</div>
+
+    <hr>
+        <h5 class="shapeHeaders" id="scalingRectTitle">Rectangle</h5>
+    <hr>
+
+        <div class="form-popup" id="scaleRectForm">
+            <form action="" class="form-container" id='scaleRectForm'>
+                
+                <label class="scaleShape" for="scaleRect"><b>Scale Factor:</b></label>
+                <input class="scaleShape" type="number" id="scaleRect" placeholder="Scale Factor" name="scaleRect" min="1" required>
+    
+                <input type='submit' value="Click to Scale Rectangle" id="scaleRectangle" class="btn btn-secondary"></input>
+            </form>
+        </div>
+
+    <hr>
+        <h5 class="shapeHeaders" id="scalingCircTitle">Circle</h5>
+    <hr>
+
+        <div class="form-popup" id="scaleCircleForm">
+            <form action="" class="form-container" id='scaleCircleForm'>
+                
+                <label class="scaleShape" for="scaleCirc"><b>Scale Factor:</b></label>
+                <input class="scaleShape" type="number" id="scaleCirc" placeholder="Scale Factor" name="scaleCirc" min="1" required>
+    
+                <input type='submit' value="Click to Scale Circle" id="scaleCircle" class="btn btn-secondary"></input>
             </form>
         </div>
 

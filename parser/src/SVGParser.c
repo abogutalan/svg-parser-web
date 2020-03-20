@@ -2056,7 +2056,7 @@ void updateGroupAttributes(List * groups, Attribute * newAttribute, int elemInde
     else deleteAttribute(newAttribute);
 }
 
-void editAttributes(SVGimage* image, char* elemType, int elemIndex, char* newName, char* newVal, char* filename) {
+char* editAttributes(SVGimage* image, char* elemType, int elemIndex, char* newName, char* newVal, char* filename) {
 
     Attribute * newAttribute = (Attribute *)malloc(sizeof(Attribute));   
             
@@ -2079,11 +2079,56 @@ void editAttributes(SVGimage* image, char* elemType, int elemIndex, char* newNam
     }
     else
     {
-        printf("Element type does not match with any shape to edit attributes!");
+        return "Element type does not match with any shape to edit attributes!";
         deleteAttribute(newAttribute);
     }
     
     writeSVGimage(image, filename);
+    return "Edited Attributes successfully!";
+}
+
+char* scaleRectangle(SVGimage* img, char* filename, int scaleFactor) {
+
+    List * rects = getRects(img);
+    ListIterator iterator;
+    void * tmp;
+
+    iterator = createIterator(rects);
+    tmp = nextElement(&iterator);
+    while (tmp != NULL) {
+        Rectangle * tmpRect = (Rectangle *)tmp;
+        
+        tmpRect->x *= scaleFactor;
+        tmpRect->y *= scaleFactor;
+
+        tmp = nextElement(&iterator);
+    }
+
+    writeSVGimage(img, filename);
+
+    return "Rectangles are scaled successfully!";
+}
+
+char* scaleCircle(SVGimage* img, char* filename, int scaleFactor) {
+
+    List * cirles = getCircles(img);
+    ListIterator iterator;
+    void * tmp;
+
+    iterator = createIterator(cirles);
+    tmp = nextElement(&iterator);
+    while (tmp != NULL) {
+        Circle * tmpCirc = (Circle *)tmp;
+        
+        tmpCirc->cx *= scaleFactor;
+        tmpCirc->cy *= scaleFactor;
+               
+        tmp = nextElement(&iterator);
+    }
+
+    writeSVGimage(img, filename);
+
+    return "Circles are scaled successfully!";
 }
 
 void setAttribute(SVGimage* image, elementType elemType, int elemIndex, Attribute* newAttribute) {
@@ -2868,9 +2913,7 @@ void addRect(SVGimage* img, char* filename, char* rect_x, char* rect_y, char* re
     rect->width = atof(rect_h);
     rect->height = atof(rect_w);
     strcpy(rect->units,rect_unit);
-    printf("unit: %s\n",rect->units);
-    printf("len: %ld\n",strlen(rect->units));
-
+    
     rect->otherAttributes = initializeList(&attributeToString, &deleteAttribute, &compareAttributes);
 
     addComponent(img, RECT, (void*)rect);

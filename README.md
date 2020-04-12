@@ -9,7 +9,7 @@ You do not need to do much backend coding at all for Module 1. app.js should jus
 ### 1. Install
 
 ```Bash
-# From the root of the directory
+# From the root of the directory 
 npm install
 ```
 
@@ -20,6 +20,7 @@ npm install
 npm run dev PORT
 # Server will be accessible at http://localhost:PORT
 ```
+# pkill node
 
 ## Directory Structure
 

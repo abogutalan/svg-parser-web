@@ -96,7 +96,7 @@ let sharedLib = ffi.Library('./libsvgparse', {
       'addPath': [ 'void', [ 'pointer', 'string', 'string' ] ],
       'editAttributes': [ 'string', [ 'pointer', 'string', 'int', 'string', 'string', 'string' ] ],
       'scaleRectangle': [ 'string', [ 'pointer', 'string', 'int' ] ],
-      'scaleCircle': [ 'string', [ 'pointer', 'string', 'int' ] ]
+      'scaleCircle': [ 'string', [ 'pointer', 'string', 'int' ] ]      
       
 });
 
@@ -565,10 +565,212 @@ app.get('/someendpoint', function(req , res){
 app.listen(portNum);
 console.log('Running app at localhost: ' + portNum);
 
+function convertToValidString(input){
+  let string = input;
+  let words = string.split('+');
+  let newString = "";
+  for ( let i = 0; i < words.length; i++){
+    newString += words[i] + " ";
+  }
+  return newString;
+}
 
 
 //******************** A4 code starts here ******************** 
 
+// global data base conection variable
+let dbConnection;
+
+app.post('/db_logIn', function(req, res) {
+  var output = {};
+  
+  req.on('data', function(data) {
+    data = data.toString();
+    data = data.split('&');
+    for (let i = 0; i < data.length; i++) {
+        var tokenizedData = data[i].split("=");
+        output[tokenizedData[0]] = tokenizedData[1];
+    }
+
+    dbConnection = {
+      host     : 'dursley.socs.uoguelph.ca',
+      user     : output.username,
+      password : output.password,
+      database : output.dbName
+    };
+
+    /* Creating Tables */
+    let fileQuery = "CREATE TABLE IF NOT EXISTS FILE (\
+      svg_id INT AUTO_INCREMENT,\
+      file_name VARCHAR(60) NOT NULL,\
+      file_title VARCHAR(256),\
+      file_description VARCHAR(256),\
+      n_rect INT NOT NULL,\
+      n_circ INT NOT NULL,\
+      n_path INT NOT NULL,\
+      n_group INT NOT NULL,\
+      creation_time DATETIME NOT NULL,\
+      file_size INT NOT NULL, \
+      PRIMARY KEY (svg_id))";
+
+    let changeQuery = "CREATE TABLE IF NOT EXISTS IMG_CHANGE (\
+      change_id INT AUTO_INCREMENT,\
+      change_type VARCHAR(256) NOT NULL,\
+      change_summary VARCHAR(256) NOT NULL,\
+      change_time DATETIME NOT NULL,\
+      svg_id INT NOT NULL,\
+      PRIMARY KEY (change_id),\
+      FOREIGN KEY(svg_id) REFERENCES FILE(svg_id) ON DELETE CASCADE)";
+
+    let downloadQuery = "CREATE TABLE IF NOT EXISTS DOWNLOAD (\
+      download_id INT AUTO_INCREMENT,\
+      d_descr VARCHAR(256),\
+      svg_id INT NOT NULL,\
+      PRIMARY KEY (download_id),\
+      FOREIGN KEY(svg_id) REFERENCES FILE(svg_id) ON DELETE CASCADE)";
+
+      async function main() {
+        // get the client
+        const mysql = require('mysql2/promise');
+        
+        let connection;
+    
+        try{
+            // create the connection
+            connection = await mysql.createConnection(dbConnection)
+
+            //Populate the table
+            await connection.execute(fileQuery);
+            await connection.execute(changeQuery);
+            await connection.execute(downloadQuery);
+    
+        }catch(e){
+            console.log("Query error: "+e);
+        }finally {
+            if (connection && connection.end) connection.end();
+        }        
+      }    
+    main();
+
+  })
+  
+  // console.log(output); //empty 
+  
+  res.redirect('/');
+
+});
+
+function getFileSize(path){
+  let stats = fs.statSync(path);
+  let fileSizeInBytes = stats["size"];
+  let fileSizeKB = fileSizeInBytes / 1024;
+  let roundedNum = Math.round(fileSizeKB);
+  let fileSizeStr = roundedNum.toString(8);
+  let fileSize = parseInt(fileSizeStr);
+  return fileSize;
+}
+
+app.post('/storeFiles', function(req, res) {
+  var output = {};
+  
+  req.on('data', function(data) {
+    data = data.toString();
+    data = data.split('&');
+    for (let i = 0; i < data.length; i++) {
+        var tokenizedData = data[i].split("=");
+        output[tokenizedData[0]] = tokenizedData[1];
+    }
+    
+    let filename = output.filename.toString().trim();
+
+    let path = "./uploads/"+ filename;
+    let img = sharedLib.createValidSVGimage(path, "parser/validation/svg.xsd");
+    /* title */
+    let svgTitle = sharedLib.getSVGTitle(img);
+    /* description */
+    let svgDesc = sharedLib.getSVGDescription(img);
+    /* num shapes */
+    let svgJson = sharedLib.SVGtoJSON(img);
+    svgJson = JSON.parse(svgJson);
+    /* date time */
+    var date = new Date().toISOString().slice(0, 19).replace('T', ' ');
+    //.toJSON().slice(0,10).replace(/-/g,'/');
+    
+    /* get file size */
+    let fileSize = getFileSize(path);
+
+    let storeFilesQuery = "INSERT INTO FILE (\
+      file_name,file_title,file_description,n_rect,n_circ,n_path,n_group,creation_time,file_size)\
+       VALUES ('"+ filename + "','"+ svgTitle + "','"+svgDesc + "',"+svgJson.numRect + ","+svgJson.numCirc + "\
+       ,"+svgJson.numPaths + ","+ svgJson.numGroups + ",'" + date + "'," +fileSize + ")";
+
+      async function main() {
+        // get the client
+        const mysql = require('mysql2/promise');
+    
+        let connection;
+        
+        try{
+            // create the connection
+            connection = await mysql.createConnection(dbConnection);
+            //Populate the table
+            await connection.execute(storeFilesQuery);
+            
+        }catch(e){
+            console.log("Query error: "+e);
+        }finally {
+            if (connection && connection.end) connection.end();
+        }
+        
+      }
+      main();
+  })
+    
+  res.redirect('/');
+
+});
+
+app.post('/trackDownloads', function(req, res) {
+  var output = {};
+  
+  req.on('data', function(data) {
+    data = data.toString();
+    data = data.split('&');
+    for (let i = 0; i < data.length; i++) {
+        var tokenizedData = data[i].split("=");
+        output[tokenizedData[0]] = tokenizedData[1];
+    }
+    
+    let filename = output.filename.toString().trim();
+    console.log("trackDownloadFN: "+ filename);
+
+    let trackDownloadsQuery = "INSERT INTO DOWNLOAD (d_descr, svg_id) VALUES ('"+ filename + "',(SELECT svg_id FROM FILE WHERE file_name='"+ filename + "'))";
+
+      async function main() {
+        // get the client
+        const mysql = require('mysql2/promise');
+    
+        let connection;
+        
+        try{
+            // create the connection
+            connection = await mysql.createConnection(dbConnection);
+            //Populate the table
+            await connection.execute(trackDownloadsQuery);
+            
+        }catch(e){
+            console.log("Query error: "+e);
+        }finally {
+            if (connection && connection.end) connection.end();
+        }
+        
+      }
+      main();
+  })
+    
+  res.redirect('/');
+
+});
 
 let dbConf = {
 	host     : 'dursley.socs.uoguelph.ca',
@@ -576,21 +778,23 @@ let dbConf = {
 	password : '1109732',
 	database : 'aogutala'
 };
-//let createTable = "CREATE TABLE student (last_name CHAR(30), first_name CHAR(30), mark CHAR(10))";
+let createTable = "CREATE TABLE IF NOT EXISTS student (\
+last_name CHAR(30), first_name CHAR(30), mark CHAR(10))";
 
 let insRec = "INSERT INTO student (last_name, first_name, mark) VALUES ('Hugo','Victor','B+'),('Rudin','Walter','A-'),('Stevens','Richard','C')";
 
 async function main() {
     // get the client
     const mysql = require('mysql2/promise');
-    
-    let connection;
 
+    let connection;
+    
     try{
         // create the connection
         connection = await mysql.createConnection(dbConf)
         //Populate the table
-        await connection.execute(insRec);
+	      //await connection.execute(createTable);
+        //await connection.execute(insRec);
 
         //Run select query, wait for results
         const [rows1, fields1] = await connection.execute('SELECT * from `student` ORDER BY `last_name`');
@@ -607,7 +811,7 @@ async function main() {
             console.log("ID: "+row.id+" Last name: "+row.last_name+" First name: "+row.first_name+" mark: "+row.mark );
         }
 
-        await connection.execute("DELETE FROM student");
+        await connection.execute("DELETE FROM student");  // to do : comment this out to clear student table
     }catch(e){
         console.log("Query error: "+e);
     }finally {
@@ -616,4 +820,4 @@ async function main() {
     
   }
 
-main();
+//main();

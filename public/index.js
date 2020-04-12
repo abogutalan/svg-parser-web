@@ -33,6 +33,9 @@ $(document).ready(function() {
         }
     });
 
+    var isLoggedIn = 0;
+
+
 
     /* *** File Log Panel *** */
     $.ajax({
@@ -70,6 +73,13 @@ $(document).ready(function() {
                     a.appendChild(img);                    
                     a.href = "uploads/"+data[k].fileName;
                     a.download = data[k].fileName;
+
+                    //a.click();
+                    a.addEventListener("click", function(){
+                        trackDownloads(data[k].fileName);
+                       
+                    });
+                    
                     img.height = 100;
                     img.width = 100;
                     cell0.appendChild(a);
@@ -81,6 +91,10 @@ $(document).ready(function() {
                     a.appendChild(fileN);
                     a.href = data[k].fileName;
                     a.download = data[k].fileName;
+                    a.addEventListener("click", function(){
+                        trackDownloads(data[k].fileName);
+                       
+                    });
                     cell1.appendChild(a);
                 }
                 else if(i == 2) {
@@ -182,11 +196,9 @@ $(document).ready(function() {
                 scaleShapeDropDown.add(option);
             }
 
-            
             document.getElementById('mySelect').addEventListener('change', update, true);
             let curVal;
             function update(dropDownList) {
-                
                 curVal = dropDownList.currentTarget.value;
                 console.log("selected item : "+curVal); 
 
@@ -872,6 +884,92 @@ $(document).ready(function() {
         });
         // location.reload(true);
     });
+
+
+
+
+    // A4 codes
+
+    $('#logInForm').submit(function(e){
+
+        console.log("Log In button clicked!");
+        e.preventDefault();
+
+        $.ajax({
+            type: 'post',
+            dataType: 'json',
+            url: '/db_logIn',
+            data: { 
+                username: $('#usernameBox').val(),
+                password: $('#passwordBox').val(),
+                dbName: $('#dbNameBox').val()    
+            },
+            success: function (data) {
+                console.log(data);
+            },
+            fail: function(error) {
+                console.log("Error creating new SVG image!");
+                console.log(error);
+            }
+        });
+    });
+
+    $('#storeFilesForm').submit(function(e){
+
+        console.log("Store Files button clicked!");
+
+        e.preventDefault();
+
+        function passAllSVGfilesToDatabase() {
+            var files = document.getElementById('mySelect');
+            console.log("len: "+ files.length);
+            if(files.length < 2) alert("No files in File Log!");
+       
+            for(var i = 1; i < files.length; i++) {
+                console.log("fN: "+ files[i].value);
+                
+                $.ajax({
+                    type: 'post',
+                    dataType: 'json',
+                    url: '/storeFiles',
+                    data: { 
+                        filename: files[i].value    
+                    },
+                    success: function (data) {
+                        console.log(data);
+                    },
+                    fail: function(error) {
+                        console.log("Error creating new SVG image!");
+                        console.log(error);
+                    }
+                });
+            }
+        }
+          passAllSVGfilesToDatabase();
+        
+        
+        
+    });
+
+    function trackDownloads(filename) {
+        alert(filename);
+        $.ajax({
+            type: 'post',
+            dataType: 'json',
+            url: '/trackDownloads',
+            data: { 
+                filename: filename    
+            },
+            success: function (data) {
+                console.log(data);
+            },
+            fail: function(error) {
+                console.log("Error creating new SVG image!");
+                console.log(error);
+            }
+        });
+
+    }
 
 
 

@@ -1097,6 +1097,7 @@ app.get('/db_display', function(req, res) {
   let fileQuery = "SELECT svg_id FROM FILE";   
   let changeQuery = "SELECT change_id FROM IMG_CHANGE";   
   let downloadQuery = "SELECT download_id FROM DOWNLOAD";   
+
   let filesNum, changesNum, donwloadsNum;
 
   async function main() {
@@ -1134,6 +1135,85 @@ app.get('/db_display', function(req, res) {
   main();
   
 });
+
+/* display all files on QUERY TABLE */
+app.get('/queryDisplayFiles', function(req, res) {
+
+  let fileQuery = "SELECT * FROM FILE";  
+ 
+  executeQuery(fileQuery, res);
+  
+});
+/* sory all files on QUERY TABLE by name */
+app.get('/querySortByName', function(req, res) {
+
+  let fileQuery = "SELECT * FROM FILE ORDER BY file_name";  
+ 
+  executeQuery(fileQuery, res);
+  
+});
+/* sory all files on QUERY TABLE by name */
+app.get('/querySortBySize', function(req, res) {
+
+  let fileQuery = "SELECT * FROM FILE ORDER BY file_size";  
+ 
+  executeQuery(fileQuery, res);
+  
+});
+
+async function executeQuery(fileQuery, res) {
+  // get the client
+  const mysql = require('mysql2/promise');
+
+  let connection;
+  
+  try{
+      // create the connection
+      connection = await mysql.createConnection(dbConnection);
+      //Populate the table
+      
+      const [files] = await connection.execute(fileQuery);
+
+      var myStack = [];
+
+      for (var i in files) {
+
+          let file_name = files[i].file_name;
+          let file_title = files[i].file_title;
+          let file_description = files[i].file_description;
+          let n_rect = files[i].n_rect;
+          let n_circ = files[i].n_circ;
+          let n_path = files[i].n_path;
+          let n_group = files[i].n_group;
+          let creation_time = files[i].creation_time;
+          creation_time = creation_time.toISOString().slice(0, 19).replace('T', ' ');
+          let file_size = files[i].file_size;
+          
+          var myJson = {
+            file_name: file_name,
+            file_title: file_title,
+            file_description: file_description,
+            n_rect: n_rect,
+            n_circ: n_circ,
+            n_path: n_path,
+            n_group: n_group,
+            creation_time: creation_time,
+            file_size: file_size
+          };  
+      
+          myStack.push(myJson);         
+    
+      }       
+      
+      res.send(myStack);
+  
+  }catch(e){
+      console.log("Query error: "+e);
+  }finally {
+      if (connection && connection.end) connection.end();
+  }
+  
+}
 
 let dbConf = {
 	host     : 'dursley.socs.uoguelph.ca',

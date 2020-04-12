@@ -694,7 +694,7 @@ $(document).ready(function() {
         location.reload(true);
     });
 
-    
+    var click_counter = 0;
     $('#newSVGForm').submit(function(e){
         
         console.log("Create SVG button clicked!");
@@ -718,7 +718,16 @@ $(document).ready(function() {
                 console.log(error);
             }
         });
-        location.reload(true);
+        click_counter++;
+        if(click_counter == 1) {
+            alert("Please click Create SVG button again to update File Log and IMG_CHANGE table");
+        }
+        else if (click_counter == 2) {
+            location.reload(true);
+            click_counter = 0;
+        }
+        //location.reload(true); 
+        
     });
 
 
@@ -737,6 +746,12 @@ $(document).ready(function() {
 
     $('#shapeFormRect').submit(function(e){      
         console.log("add Rect button clicked!");
+
+        let val_X = $('#rectX').val();
+
+        if (val_X == 7) {
+            val_X++;
+        }
                 
         e.preventDefault();
         $.ajax({
@@ -746,7 +761,7 @@ $(document).ready(function() {
             url: '/addRectangle',
             data: { 
                 fileName: selectedSVGtoAddShape,
-                x: $('#rectX').val(),
+                x: val_X,
                 y: $('#rectY').val(),
                 height: $('#rect_H').val(),
                 width: $('#rect_W').val(),
@@ -766,6 +781,12 @@ $(document).ready(function() {
 
     $('#shapeFormCircle').submit(function(e){      
         console.log("add Circle button clicked!");
+
+        let val_X = $('#circleX').val();
+
+        if (val_X == 7) {
+            val_X++;
+        }
                 
         e.preventDefault();
         $.ajax({
@@ -775,7 +796,7 @@ $(document).ready(function() {
             url: '/addCircle',
             data: { 
                 fileName: selectedSVGtoAddShape,
-                cx: $('#circleX').val(),
+                cx: val_X,
                 cy: $('#circleY').val(),
                 r: $('#circle_R').val(),
                 units: $('#circle_unit').val()
@@ -892,7 +913,7 @@ $(document).ready(function() {
 
     $('#logInForm').submit(function(e){
 
-        console.log("Log In button clicked!");
+        console.log("Logging In!");
         e.preventDefault();
 
         $.ajax({
@@ -908,51 +929,99 @@ $(document).ready(function() {
                 console.log(data);
             },
             fail: function(error) {
-                console.log("Error creating new SVG image!");
+                console.log("Error while logging in!");
                 console.log(error);
             }
         });
     });
 
-    $('#storeFilesForm').submit(function(e){
+    // inserting all files displayed in the File Log Panel into the database
+    $('#storeFiles').click(function(e){
 
-        console.log("Store Files button clicked!");
+        console.log("Storing all Files from uploads directory!");
 
         e.preventDefault();
-
-        function passAllSVGfilesToDatabase() {
-            var files = document.getElementById('mySelect');
-            console.log("len: "+ files.length);
-            if(files.length < 2) alert("No files in File Log!");
-       
-            for(var i = 1; i < files.length; i++) {
-                console.log("fN: "+ files[i].value);
-                
-                $.ajax({
-                    type: 'post',
-                    dataType: 'json',
-                    url: '/storeFiles',
-                    data: { 
-                        filename: files[i].value    
-                    },
-                    success: function (data) {
-                        console.log(data);
-                    },
-                    fail: function(error) {
-                        console.log("Error creating new SVG image!");
-                        console.log(error);
-                    }
-                });
-            }
-        }
-          passAllSVGfilesToDatabase();
         
-        
-        
+        passAllSVGfilesToDatabase();       
     });
 
+    function passAllSVGfilesToDatabase() {
+        var files = document.getElementById('mySelect');
+        console.log("len: "+ files.length);
+        if(files.length < 2) alert("No files in File Log!");
+   
+        for(var i = 1; i < files.length; i++) {
+            
+            $.ajax({
+                type: 'post',
+                dataType: 'json',
+                url: '/storeFiles',
+                data: { 
+                    filename: files[i].value    
+                },
+                success: function (data) {
+                    console.log(data);
+                },
+                fail: function(error) {
+                    console.log("Error storing files!");
+                    console.log(error);
+                }
+            });
+        }
+    }
+
+    $('#clearFiles').click(function(e){
+
+        console.log("Clearing all data!");
+        e.preventDefault();
+
+        $.ajax({
+            type: 'post',
+            dataType: 'json',
+            url: '/db_clear',
+            data: { 
+                table: "FILE"   
+            },
+            success: function (data) {
+                console.log(data);
+            },
+            fail: function(error) {
+                console.log("Error clearing data!");
+                console.log(error);
+            }
+        });
+    });
+
+    $('#displayStatus').click(function(e){
+
+        console.log("Displaying all data!");
+        e.preventDefault();
+
+        $.ajax({
+            type: 'get',
+            dataType: 'json',
+            url: '/db_display',
+            data: { 
+                filesNum: "0",
+                changesNum: "0",
+                donwloadsNum: "0"   
+            },
+            success: function (data) {
+                console.log(data);
+                alert("Database has "+ data.filesNum + " files, "+ data.changesNum + " changes, and " + data.donwloadsNum + " downloads.");
+            },
+            fail: function(error) {
+                console.log("Error clearing data!");
+                console.log(error);
+            }
+        });
+    });
+
+    
+
+    // inserting a record into the DOWNLOAD table
     function trackDownloads(filename) {
-        alert(filename);
+
         $.ajax({
             type: 'post',
             dataType: 'json',
@@ -964,7 +1033,7 @@ $(document).ready(function() {
                 console.log(data);
             },
             fail: function(error) {
-                console.log("Error creating new SVG image!");
+                console.log("Error tracking downloads!");
                 console.log(error);
             }
         });

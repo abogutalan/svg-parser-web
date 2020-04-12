@@ -256,6 +256,7 @@ app.post('/editAttr', function(req, res) {
 
     let filename = output.filename.toString();
     path = "./uploads/"+ filename.toString();
+    let filesize = getFileSize(path);
 
     if(filename.length != 0) {
       let img = sharedLib.createValidSVGimage(path, "parser/validation/svg.xsd");
@@ -267,6 +268,9 @@ app.post('/editAttr', function(req, res) {
       if(retVal == 0) {
         console.log("SVG is invalid after setting attributes!");
         fs.unlinkSync(path);
+      } else {
+        /* insert record into the IMG_CHANGE table if the svg is still valid */
+        trackChanges_EditAttributes(filename, elem_type, index, name, value, filesize);
       }
 
 
@@ -278,6 +282,40 @@ app.post('/editAttr', function(req, res) {
   res.redirect('/');
 
 });
+
+function trackChanges_EditAttributes(filename, elem_type, index, name, value, filesize){
+
+  let changeType = "edit attribute";
+  let description = "edit " + name + "=" + value + " for " + elem_type + " " + index + " of " + filename ;
+  var date = new Date().toISOString().slice(0, 19).replace('T', ' ');
+
+    let query = "INSERT INTO IMG_CHANGE (change_type, change_summary, change_time, svg_id)\
+     VALUES ('"+ changeType + "', '"+ description + "', '" + date + "', (SELECT svg_id FROM FILE WHERE file_name='"+ filename + "'))";
+    
+    let updateFileSize = "UPDATE FILE SET file_size="+filesize+" WHERE FILE.file_name = '"+filename+"'";
+
+      async function main() {
+        // get the client
+        const mysql = require('mysql2/promise');
+    
+        let connection;
+        
+        try{
+            // create the connection
+            connection = await mysql.createConnection(dbConnection);
+            //Populate the table
+            await connection.execute(query);
+            await connection.execute(updateFileSize);
+            
+        }catch(e){
+            console.log("Query error: "+e);
+        }finally {
+            if (connection && connection.end) connection.end();
+        }
+        
+      }
+      main();
+}
 
 app.post('/editTitleAndDescription', function(req, res) {
   var output = {};
@@ -317,6 +355,8 @@ app.post('/editTitleAndDescription', function(req, res) {
     if(filename.length != 0) {
       let img = sharedLib.createValidSVGimage(path, "parser/validation/svg.xsd");
       sharedLib.setTitleAndDesc(img, title, description, path);
+      
+      trackChanges_EditTitleAndDesc(filename, title, description);
     }
     else console.log("File name is empty!");
 
@@ -325,6 +365,37 @@ app.post('/editTitleAndDescription', function(req, res) {
   res.redirect('/');
 
 });
+
+function trackChanges_EditTitleAndDesc(filename, title, desc){
+
+  let changeType = "edit title and description";
+  let description = "edit "+ filename + " as title=" + title + " & description=" + desc ;
+  var date = new Date().toISOString().slice(0, 19).replace('T', ' ');
+
+    let query = "INSERT INTO IMG_CHANGE (change_type, change_summary, change_time, svg_id)\
+     VALUES ('"+ changeType + "', '"+ description + "', '" + date + "', (SELECT svg_id FROM FILE WHERE file_name='"+ filename + "'))";
+
+      async function main() {
+        // get the client
+        const mysql = require('mysql2/promise');
+    
+        let connection;
+        
+        try{
+            // create the connection
+            connection = await mysql.createConnection(dbConnection);
+            //Populate the table
+            await connection.execute(query);
+            
+        }catch(e){
+            console.log("Query error: "+e);
+        }finally {
+            if (connection && connection.end) connection.end();
+        }
+        
+      }
+      main();
+}
 
 app.post('/newSVG', function(req, res) {
   var output = {};
@@ -358,6 +429,8 @@ app.post('/newSVG', function(req, res) {
     /* creating new valid SVG */
     if((".svg" === extension) && (filename.length != 0)) {
       sharedLib.createNewSVGobject("./uploads/" + filename, title, description);
+      insertIntoFileTable(filename);
+      trackChanges_CreateNewSVG(filename);
     }
     else console.log("Invalid extension or empty file name ERROR !");
   })
@@ -367,6 +440,37 @@ app.post('/newSVG', function(req, res) {
   res.redirect('/');
 
 });
+
+function trackChanges_CreateNewSVG(filename){
+
+  let changeType = "create new svg";
+  let description = filename + " is created";
+  var date = new Date().toISOString().slice(0, 19).replace('T', ' ');
+
+    let query = "INSERT INTO IMG_CHANGE (change_type, change_summary, change_time, svg_id)\
+     VALUES ('"+ changeType + "', '"+ description + "', '" + date + "', (SELECT svg_id FROM FILE WHERE file_name='"+ filename + "'))";
+
+      async function main() {
+        // get the client
+        const mysql = require('mysql2/promise');
+    
+        let connection;
+        
+        try{
+            // create the connection
+            connection = await mysql.createConnection(dbConnection);
+            //Populate the table
+            await connection.execute(query);
+            
+        }catch(e){
+            console.log("Query error: "+e);
+        }finally {
+            if (connection && connection.end) connection.end();
+        }
+        
+      }
+      main();
+}
 
 
 app.post('/addRectangle', function(req, res) {
@@ -399,10 +503,12 @@ app.post('/addRectangle', function(req, res) {
     
     path = "./uploads/"+ filename.toString();
     // console.log("filePath: "+ path + " x: "+x + "y: "+y +"height: "+height +"width: "+width+"units: "+units);
+    let filesize = getFileSize(path);
 
     if(filename.length != 0) {
       let img = sharedLib.createValidSVGimage(path, "parser/validation/svg.xsd");
       sharedLib.addRect(img, path, x, y, height, width, unit);
+      trackChanges_AddRect(filename, x, y, height, width, filesize);
     }
     else console.log("File name is empty!");
 
@@ -412,6 +518,40 @@ app.post('/addRectangle', function(req, res) {
 
 });
 
+function trackChanges_AddRect(filename, x, y, height, width, filesize){
+
+  let changeType = "add rect";
+  let description = "add rect at "+x+","+y+" with height "+height+" and width "+width+" to "+filename;
+  var date = new Date().toISOString().slice(0, 19).replace('T', ' ');
+
+    let query = "INSERT INTO IMG_CHANGE (change_type, change_summary, change_time, svg_id)\
+     VALUES ('"+ changeType + "', '"+ description + "', '" + date + "', (SELECT svg_id FROM FILE WHERE file_name='"+ filename + "'))";
+
+    let updateFileSize = "UPDATE FILE SET file_size="+filesize+" WHERE FILE.file_name = '"+filename+"'";
+
+      async function main() {
+        // get the client
+        const mysql = require('mysql2/promise');
+    
+        let connection;
+        
+        try{
+            // create the connection
+            connection = await mysql.createConnection(dbConnection);
+            //Populate the table
+            await connection.execute(query);
+            await connection.execute(updateFileSize);
+
+            
+        }catch(e){
+            console.log("Query error: "+e);
+        }finally {
+            if (connection && connection.end) connection.end();
+        }
+        
+      }
+      main();
+}
 
 app.post('/addCircle', function(req, res) {
   var output = {};
@@ -440,10 +580,12 @@ app.post('/addCircle', function(req, res) {
     
     path = "./uploads/"+ filename.toString();
     // console.log("filePath: "+ path + " x: "+cx + "y: "+cy +"radius: "+r+"units: "+units);
+    let filesize = getFileSize(path);
 
     if(filename.length != 0) {
       let img = sharedLib.createValidSVGimage(path, "parser/validation/svg.xsd");
       sharedLib.addCircle(img, path, cx, cy, r, unit);
+      trackChanges_AddCirc(filename, cx, cy, r, filesize);
     }
     else console.log("File name is empty!");
 
@@ -452,6 +594,42 @@ app.post('/addCircle', function(req, res) {
   res.redirect('/');
 
 });
+
+function trackChanges_AddCirc(filename, cx, cy, r, filesize){
+
+  let changeType = "add circle";
+  let description = "add circle at "+cx+","+cy+" with radius "+r+" to "+filename;
+  var date = new Date().toISOString().slice(0, 19).replace('T', ' ');
+
+    let query = "INSERT INTO IMG_CHANGE (change_type, change_summary, change_time, svg_id)\
+     VALUES ('"+ changeType + "', '"+ description + "', '" + date + "', (SELECT svg_id FROM FILE WHERE file_name='"+ filename + "'))";
+    
+     let updateFileSize = "UPDATE FILE SET file_size="+filesize+" WHERE FILE.file_name = '"+filename+"'";
+
+      async function main() {
+        // get the client
+        const mysql = require('mysql2/promise');
+    
+        let connection;
+        
+        try{
+            // create the connection
+            connection = await mysql.createConnection(dbConnection);
+            //Populate the table
+            await connection.execute(query);
+            await connection.execute(updateFileSize);
+
+            
+        }catch(e){
+            console.log("Query error: "+e);
+        }finally {
+            if (connection && connection.end) connection.end();
+        }
+        
+      }
+      main();
+}
+
 
 app.post('/addPath', function(req, res) {
   var output = {};
@@ -476,10 +654,12 @@ app.post('/addPath', function(req, res) {
     
     path = "./uploads/"+ filename.toString();
     // console.log("filePath: "+ path + " d: "+d);
+    let filesize = getFileSize(path);
 
     if(filename.length != 0) {
       let img = sharedLib.createValidSVGimage(path, "parser/validation/svg.xsd");
       sharedLib.addPath(img, path, d);
+      trackChanges_AddPath(filename, d, filesize);
     }
     else console.log("File name is empty!");
 
@@ -488,6 +668,41 @@ app.post('/addPath', function(req, res) {
   res.redirect('/');
 
 });
+
+function trackChanges_AddPath(filename, d, filesize){
+
+  let changeType = "add path";
+  let description = "add path d="+d+" to "+filename;
+  var date = new Date().toISOString().slice(0, 19).replace('T', ' ');
+
+    let query = "INSERT INTO IMG_CHANGE (change_type, change_summary, change_time, svg_id)\
+     VALUES ('"+ changeType + "', '"+ description + "', '" + date + "', (SELECT svg_id FROM FILE WHERE file_name='"+ filename + "'))";
+
+    let updateFileSize = "UPDATE FILE SET file_size="+filesize+" WHERE FILE.file_name = '"+filename+"'";
+    
+
+      async function main() {
+        // get the client
+        const mysql = require('mysql2/promise');
+    
+        let connection;
+        
+        try{
+            // create the connection
+            connection = await mysql.createConnection(dbConnection);
+            //Populate the table
+            await connection.execute(query);
+            await connection.execute(updateFileSize);
+            
+        }catch(e){
+            console.log("Query error: "+e);
+        }finally {
+            if (connection && connection.end) connection.end();
+        }
+        
+      }
+      main();
+}
 
 app.post('/scaleRectangle', function(req, res) {
   var output = {};
@@ -506,11 +721,13 @@ app.post('/scaleRectangle', function(req, res) {
     let filename = output.fileName.toString();
     
     path = "./uploads/"+ filename.toString();
+    let filesize = getFileSize(path);
 
     if(filename.length != 0) {
       let img = sharedLib.createValidSVGimage(path, "parser/validation/svg.xsd");
       let retScaleRect = sharedLib.scaleRectangle(img, path, scaleFactor);
-      console.log(retScaleRect);
+      //console.log(retScaleRect);
+      trackChanges_ScaleRect(filename, scaleFactor, filesize)
     }
     else console.log("File name is empty!");
 
@@ -519,6 +736,41 @@ app.post('/scaleRectangle', function(req, res) {
   res.redirect('/');
 
 });
+
+function trackChanges_ScaleRect(filename, scaleFactor, filesize){
+
+  let changeType = "scale rect";
+  let description = "rects of "+filename+" is scaled by "+scaleFactor;
+  var date = new Date().toISOString().slice(0, 19).replace('T', ' ');
+
+    let query = "INSERT INTO IMG_CHANGE (change_type, change_summary, change_time, svg_id)\
+     VALUES ('"+ changeType + "', '"+ description + "', '" + date + "', (SELECT svg_id FROM FILE WHERE file_name='"+ filename + "'))";
+    
+     let updateFileSize = "UPDATE FILE SET file_size="+filesize+" WHERE FILE.file_name = '"+filename+"'";
+
+      async function main() {
+        // get the client
+        const mysql = require('mysql2/promise');
+    
+        let connection;
+        
+        try{
+            // create the connection
+            connection = await mysql.createConnection(dbConnection);
+            //Populate the table
+            await connection.execute(query);
+            await connection.execute(updateFileSize);
+
+            
+        }catch(e){
+            console.log("Query error: "+e);
+        }finally {
+            if (connection && connection.end) connection.end();
+        }
+        
+      }
+      main();
+}
 
 app.post('/scaleCircle', function(req, res) {
   var output = {};
@@ -533,16 +785,18 @@ app.post('/scaleCircle', function(req, res) {
     }
     
     let scaleFactor = parseInt(output.circleFactor);
-    console.log("test circ factor: "+ scaleFactor);
     
     let filename = output.fileName.toString();
     
     path = "./uploads/"+ filename.toString();
 
+    let filesize = getFileSize(path);
+
     if(filename.length != 0) {
       let img = sharedLib.createValidSVGimage(path, "parser/validation/svg.xsd");
       let retScaleCirc = sharedLib.scaleCircle(img, path, scaleFactor);
       console.log(retScaleCirc);
+      trackChanges_ScaleCircle(filename, scaleFactor, filesize);
     }
     else console.log("File name is empty!");
 
@@ -551,6 +805,40 @@ app.post('/scaleCircle', function(req, res) {
   res.redirect('/');
 
 });
+
+function trackChanges_ScaleCircle(filename, scaleFactor, filesize){
+
+  let changeType = "scale circle";
+  let description = "circles of "+filename+" is scaled by "+scaleFactor;
+  var date = new Date().toISOString().slice(0, 19).replace('T', ' ');
+
+    let query = "INSERT INTO IMG_CHANGE (change_type, change_summary, change_time, svg_id)\
+     VALUES ('"+ changeType + "', '"+ description + "', '" + date + "', (SELECT svg_id FROM FILE WHERE file_name='"+ filename + "'))";
+
+    let updateFileSize = "UPDATE FILE SET file_size="+filesize+" WHERE FILE.file_name = '"+filename+"'";
+
+      async function main() {
+        // get the client
+        const mysql = require('mysql2/promise');
+    
+        let connection;
+        
+        try{
+            // create the connection
+            connection = await mysql.createConnection(dbConnection);
+            //Populate the table
+            await connection.execute(query);
+            await connection.execute(updateFileSize);
+            
+        }catch(e){
+            console.log("Query error: "+e);
+        }finally {
+            if (connection && connection.end) connection.end();
+        }
+        
+      }
+      main();
+}
 
 
 
@@ -564,16 +852,6 @@ app.get('/someendpoint', function(req , res){
 
 app.listen(portNum);
 console.log('Running app at localhost: ' + portNum);
-
-function convertToValidString(input){
-  let string = input;
-  let words = string.split('+');
-  let newString = "";
-  for ( let i = 0; i < words.length; i++){
-    newString += words[i] + " ";
-  }
-  return newString;
-}
 
 
 //******************** A4 code starts here ******************** 
@@ -683,52 +961,62 @@ app.post('/storeFiles', function(req, res) {
     
     let filename = output.filename.toString().trim();
 
-    let path = "./uploads/"+ filename;
-    let img = sharedLib.createValidSVGimage(path, "parser/validation/svg.xsd");
-    /* title */
-    let svgTitle = sharedLib.getSVGTitle(img);
-    /* description */
-    let svgDesc = sharedLib.getSVGDescription(img);
-    /* num shapes */
-    let svgJson = sharedLib.SVGtoJSON(img);
-    svgJson = JSON.parse(svgJson);
-    /* date time */
-    var date = new Date().toISOString().slice(0, 19).replace('T', ' ');
-    //.toJSON().slice(0,10).replace(/-/g,'/');
-    
-    /* get file size */
-    let fileSize = getFileSize(path);
-
-    let storeFilesQuery = "INSERT INTO FILE (\
-      file_name,file_title,file_description,n_rect,n_circ,n_path,n_group,creation_time,file_size)\
-       VALUES ('"+ filename + "','"+ svgTitle + "','"+svgDesc + "',"+svgJson.numRect + ","+svgJson.numCirc + "\
-       ,"+svgJson.numPaths + ","+ svgJson.numGroups + ",'" + date + "'," +fileSize + ")";
-
-      async function main() {
-        // get the client
-        const mysql = require('mysql2/promise');
-    
-        let connection;
-        
-        try{
-            // create the connection
-            connection = await mysql.createConnection(dbConnection);
-            //Populate the table
-            await connection.execute(storeFilesQuery);
-            
-        }catch(e){
-            console.log("Query error: "+e);
-        }finally {
-            if (connection && connection.end) connection.end();
-        }
-        
-      }
-      main();
+    insertIntoFileTable(filename);
   })
     
   res.redirect('/');
 
 });
+
+function insertIntoFileTable(filename) {
+
+  let path = "./uploads/"+ filename;
+  let img = sharedLib.createValidSVGimage(path, "parser/validation/svg.xsd");
+  /* title */
+  let svgTitle = sharedLib.getSVGTitle(img);
+  /* description */
+  let svgDesc = sharedLib.getSVGDescription(img);
+  /* num shapes */
+  let svgJson = sharedLib.SVGtoJSON(img);
+  svgJson = JSON.parse(svgJson);
+  /* date time */
+  var date = new Date().toISOString().slice(0, 19).replace('T', ' ');
+  //.toJSON().slice(0,10).replace(/-/g,'/');
+  
+  /* get file size */
+  let fileSize = getFileSize(path);
+
+  let flag = "SELECT file_name FROM FILE WHERE file_name LIKE \"%" + filename + "%\" LIMIT 1;";   
+
+  let storeFilesQuery = "INSERT INTO FILE (\
+    file_name,file_title,file_description,n_rect,n_circ,n_path,n_group,creation_time,file_size)\
+     VALUES ('"+ filename + "','"+ svgTitle + "','"+svgDesc + "',"+svgJson.numRect + ","+svgJson.numCirc + "\
+     ,"+svgJson.numPaths + ","+ svgJson.numGroups + ",'" + date + "'," +fileSize + ")";
+
+    async function main() {
+      // get the client
+      const mysql = require('mysql2/promise');
+  
+      let connection;
+      
+      try{
+          // create the connection
+          connection = await mysql.createConnection(dbConnection);
+          //Populate the table
+          const [row] = await connection.execute(flag);
+          let rows_num = row.length;
+          if(rows_num === 0) await connection.execute(storeFilesQuery);
+          
+          
+      }catch(e){
+          console.log("Query error: "+e);
+      }finally {
+          if (connection && connection.end) connection.end();
+      }
+      
+    }
+    main();
+}
 
 app.post('/trackDownloads', function(req, res) {
   var output = {};
@@ -742,9 +1030,9 @@ app.post('/trackDownloads', function(req, res) {
     }
     
     let filename = output.filename.toString().trim();
-    console.log("trackDownloadFN: "+ filename);
+    let description = filename + " is downloaded";
 
-    let trackDownloadsQuery = "INSERT INTO DOWNLOAD (d_descr, svg_id) VALUES ('"+ filename + "',(SELECT svg_id FROM FILE WHERE file_name='"+ filename + "'))";
+    let trackDownloadsQuery = "INSERT INTO DOWNLOAD (d_descr, svg_id) VALUES ('"+ description + "',(SELECT svg_id FROM FILE WHERE file_name='"+ filename + "'))";
 
       async function main() {
         // get the client
@@ -770,6 +1058,81 @@ app.post('/trackDownloads', function(req, res) {
     
   res.redirect('/');
 
+});
+
+app.post('/db_clear', function(req, res) {
+  
+  req.on('data', function(data) {
+    
+    let trackDownloadsQuery = "delete from FILE";
+
+      async function main() {
+        // get the client
+        const mysql = require('mysql2/promise');
+    
+        let connection;
+        
+        try{
+            // create the connection
+            connection = await mysql.createConnection(dbConnection);
+            //Populate the table
+            await connection.execute(trackDownloadsQuery);
+            
+        }catch(e){
+            console.log("Query error: "+e);
+        }finally {
+            if (connection && connection.end) connection.end();
+        }
+        
+      }
+      main();
+  })
+    
+  res.redirect('/');
+
+});
+
+app.get('/db_display', function(req, res) {
+
+  let fileQuery = "SELECT svg_id FROM FILE";   
+  let changeQuery = "SELECT change_id FROM IMG_CHANGE";   
+  let downloadQuery = "SELECT download_id FROM DOWNLOAD";   
+  let filesNum, changesNum, donwloadsNum;
+
+  async function main() {
+    // get the client
+    const mysql = require('mysql2/promise');
+
+    let connection;
+    
+    try{
+        // create the connection
+        connection = await mysql.createConnection(dbConnection);
+        //Populate the table
+        const [file] = await connection.execute(fileQuery);
+        const [change] = await connection.execute(changeQuery);
+        const [download] = await connection.execute(downloadQuery);
+        filesNum = file.length;
+        changesNum = change.length;
+        donwloadsNum = download.length;
+
+        var myJson = {
+          filesNum: filesNum,
+          changesNum: changesNum,
+          donwloadsNum: donwloadsNum
+        };  
+         
+        res.send(myJson);
+
+    }catch(e){
+        console.log("Query error: "+e);
+    }finally {
+        if (connection && connection.end) connection.end();
+    }
+    
+  }
+  main();
+  
 });
 
 let dbConf = {
@@ -821,3 +1184,10 @@ async function main() {
   }
 
 //main();
+
+
+/*
+
+  store all files, clear all files, display db status, and execute queries -> needs button
+
+*/

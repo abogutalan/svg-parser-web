@@ -32,8 +32,8 @@ $(document).ready(function() {
             console.log(error); 
         }
     });
-
-    var isLoggedIn = 0;
+    
+    var isLoggedIn = 0; // to do
 
 
 
@@ -1038,8 +1038,17 @@ $(document).ready(function() {
 
     }
 
-function populateExecuteQueryTable(myURL){
+function populateExecuteQueryTable(myURL, string){
 
+    let firstDate="";
+    let secondDate="";
+    if(string != "") {
+
+        let tmp = string.split("+");        
+        firstDate = tmp[0].trim();
+        secondDate = tmp[1].trim();
+    }
+    
     $.ajax({
         type: 'get',
         dataType: 'json',
@@ -1053,7 +1062,9 @@ function populateExecuteQueryTable(myURL){
             n_path: "0",
             n_group: "0",
             creation_time: "0",
-            file_size: "0"
+            file_size: "0",
+            first_date: firstDate,
+            second_date: secondDate
         },
         success: function(data) { 
 
@@ -1124,7 +1135,7 @@ $('#displayFiles').click(function(e){
     console.log("Displaying all files on Query Table!");
     e.preventDefault();
     myURL = '/queryDisplayFiles';
-    populateExecuteQueryTable(myURL);
+    populateExecuteQueryTable(myURL, "");
     
 }); 
 /* SORTING QUERY TABLE by NAME */
@@ -1133,7 +1144,7 @@ $('#sortByName').click(function(e){
     console.log("Sorting by Name!");
     e.preventDefault();
     myURL = '/querySortByName';
-    populateExecuteQueryTable(myURL);
+    populateExecuteQueryTable(myURL, "");
     
 }); 
 /* SORTING QUERY TABLE by SIZE */
@@ -1142,9 +1153,56 @@ $('#sortBySize').click(function(e){
     console.log("Sorting by Size!");
     e.preventDefault();
     myURL = '/querySortBySize';
-    populateExecuteQueryTable(myURL);
+    populateExecuteQueryTable(myURL, "");
     
 }); 
+
+/* display files between spesific dates */
+$('#displayBetweenDates').click(function(e){
+
+    console.log("Displaying between spesific dates!");
+    let firstDate = $('#firstDateBox').val();
+    let secondDate = $('#secondDateBox').val();
+    let dates = firstDate + "+" + secondDate;
+    e.preventDefault();
+    myURL = '/queryDisplayBetweenDates';
+    populateExecuteQueryTable(myURL, dates);    
+});
+/* display files by name */
+$('#displayByName').click(function(e){
+
+    console.log("Displaying by names!");
+    let firstDate = $('#firstDateBox').val();
+    let secondDate = $('#secondDateBox').val();
+    let dates = firstDate + "+" + secondDate;
+    e.preventDefault();
+    myURL = '/queryDisplayByNames';
+    populateExecuteQueryTable(myURL, dates);    
+});
+/* display files by size */
+$('#displayBySize').click(function(e){
+
+    console.log("Displaying by size!");
+    let firstDate = $('#firstDateBox').val();
+    let secondDate = $('#secondDateBox').val();
+    let dates = firstDate + "+" + secondDate;
+    e.preventDefault();
+    myURL = '/queryDisplayBySize';
+    populateExecuteQueryTable(myURL, dates);
+    
+}); 
+/* display files by creation date */
+$('#displayByCreationDate').click(function(e){
+
+    console.log("Displaying by date!");
+    let firstDate = $('#firstDateBox').val();
+    let secondDate = $('#secondDateBox').val();
+    let dates = firstDate + "+" + secondDate;
+    e.preventDefault();
+    myURL = '/queryDisplayByDate';
+    populateExecuteQueryTable(myURL, dates);
+    
+});  
 
 function createQueryTable(table) {
     let tableHead = table.createTHead();

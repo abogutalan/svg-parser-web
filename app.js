@@ -1144,7 +1144,7 @@ app.get('/queryDisplayFiles', function(req, res) {
   executeQuery(fileQuery, res);
   
 });
-/* sory all files on QUERY TABLE by name */
+/* sort all files on QUERY TABLE by name */
 app.get('/querySortByName', function(req, res) {
 
   let fileQuery = "SELECT * FROM FILE ORDER BY file_name";  
@@ -1152,10 +1152,55 @@ app.get('/querySortByName', function(req, res) {
   executeQuery(fileQuery, res);
   
 });
-/* sory all files on QUERY TABLE by name */
+/* sort all files on QUERY TABLE by name */
 app.get('/querySortBySize', function(req, res) {
 
   let fileQuery = "SELECT * FROM FILE ORDER BY file_size";  
+ 
+  executeQuery(fileQuery, res);
+  
+});
+
+/* display files between spesific dates */
+app.get('/queryDisplayBetweenDates', function(req, res) {
+
+  let startDate = req.query.first_date;
+  let endDate = req.query.second_date;
+
+  let fileQuery = "SELECT * FROM FILE WHERE creation_time BETWEEN '" + startDate + "' AND '" + endDate + "'";  
+ 
+  executeQuery(fileQuery, res);
+  
+});
+/* sort files between spesific dates by names*/
+app.get('/queryDisplayByNames', function(req, res) {
+
+  let startDate = req.query.first_date;
+  let endDate = req.query.second_date;
+
+  let fileQuery = "SELECT * FROM FILE WHERE creation_time BETWEEN '" + startDate + "' AND '" + endDate + "' ORDER BY file_name";  
+ 
+  executeQuery(fileQuery, res);
+  
+});
+/* sort files between spesific dates by size*/
+app.get('/queryDisplayBySize', function(req, res) {
+
+  let startDate = req.query.first_date;
+  let endDate = req.query.second_date;
+
+  let fileQuery = "SELECT * FROM FILE WHERE creation_time BETWEEN '" + startDate + "' AND '" + endDate + "' ORDER BY file_size";  
+ 
+  executeQuery(fileQuery, res);
+  
+});
+/* sort files between spesific dates by date*/
+app.get('/queryDisplayByDate', function(req, res) {
+
+  let startDate = req.query.first_date;
+  let endDate = req.query.second_date;
+
+  let fileQuery = "SELECT * FROM FILE WHERE creation_time BETWEEN '" + startDate + "' AND '" + endDate + "' ORDER BY creation_time";  
  
   executeQuery(fileQuery, res);
   

@@ -1,10 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE root SYSTEM "./uploads/newfile.svg">
 <svg xmlns="http://www.w3.org/2000/svg">
-  <title>title </title>
-  <desc>description </desc>
-  <rect x="32.000000cm" y="28.000000cm" width="7.000000cm" height="7.000000cm"/>
-  <circle cx="48.000000cm" cy="42.000000cm" r="7.000000cm"/>
+  <title>any title </title>
+  <desc>any description </desc>
+  <circle cx="8.000000cm" cy="7.000000cm" r="2.000000cm"/>
   <path d="m31.7 20.9c-9.6 0-24.5 1.1-24.5 12.6 0 16.8 49.5 16.8 49.5 0 .1- "/>
   <path d="m31.7 20.9c-9.6 0-24.5 1.1-24.5 12.6 0 16.8 49.5 16.8 49.5 0 .1- "/>
 </svg>

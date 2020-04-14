@@ -1079,7 +1079,7 @@ function populateExecuteQueryTable(myURL, string){
             let len = table.rows.length;
             var row = table.insertRow(len);
     
-            /* filling File Log Panel in */
+            /* filling Execute Query Table in */
             for (let i = 0; i <= 8; i++) {
                 if(i == 0) {
                     let cell0 = row.insertCell(0);
@@ -1157,6 +1157,12 @@ $('#sortBySize').click(function(e){
     
 }); 
 
+/* ************ Query 2 ************ */
+
+/* showing time all the time */
+var date = new Date().toISOString().slice(0, 19).replace('T', ' ');
+$('#currentTime').html("Current Time: " + date);
+
 /* display files between spesific dates */
 $('#displayBetweenDates').click(function(e){
 
@@ -1166,7 +1172,8 @@ $('#displayBetweenDates').click(function(e){
     let dates = firstDate + "+" + secondDate;
     e.preventDefault();
     myURL = '/queryDisplayBetweenDates';
-    populateExecuteQueryTable(myURL, dates);    
+    if(firstDate == "" || secondDate == "") alert("Please enter dates!");
+    else populateExecuteQueryTable(myURL, dates);    
 });
 /* display files by name */
 $('#displayByName').click(function(e){
@@ -1177,7 +1184,8 @@ $('#displayByName').click(function(e){
     let dates = firstDate + "+" + secondDate;
     e.preventDefault();
     myURL = '/queryDisplayByNames';
-    populateExecuteQueryTable(myURL, dates);    
+    if(firstDate == "" || secondDate == "") alert("Please enter dates!");
+    else populateExecuteQueryTable(myURL, dates);    
 });
 /* display files by size */
 $('#displayBySize').click(function(e){
@@ -1188,7 +1196,8 @@ $('#displayBySize').click(function(e){
     let dates = firstDate + "+" + secondDate;
     e.preventDefault();
     myURL = '/queryDisplayBySize';
-    populateExecuteQueryTable(myURL, dates);
+    if(firstDate == "" || secondDate == "") alert("Please enter dates!");
+    else populateExecuteQueryTable(myURL, dates);
     
 }); 
 /* display files by creation date */
@@ -1200,9 +1209,129 @@ $('#displayByCreationDate').click(function(e){
     let dates = firstDate + "+" + secondDate;
     e.preventDefault();
     myURL = '/queryDisplayByDate';
-    populateExecuteQueryTable(myURL, dates);
+    if(firstDate == "" || secondDate == "") alert("Please enter dates!");
+    else populateExecuteQueryTable(myURL, dates);
     
-});  
+}); 
+
+/* ************ Query 3 ************ */
+function populateModifiedFilesTable(myURL, dates, sortType){
+
+    let firstDate="";
+    let secondDate="";
+    if(dates != "") {
+
+        let tmp = dates.split("+");        
+        firstDate = tmp[0].trim();
+        secondDate = tmp[1].trim();
+    }
+    
+    $.ajax({
+        type: 'get',
+        dataType: 'json',
+        url: myURL,
+        data: {
+            file_name: "",            
+            num_of_changes: "0",
+            most_recent_modification_date: "0",
+            file_size: "0",
+            first_date: firstDate,
+            second_date: secondDate,
+            sortType: sortType
+        },
+        success: function(data) { 
+
+            /* Creating Query Table */
+            var table=document.getElementById("queryTable");
+            table.innerHTML = "";            
+            
+            createModifiedFileTable(table);
+
+        for(let k = 0; k < data.length; k++){     
+            
+            let len = table.rows.length;
+            var row = table.insertRow(len);
+    
+            /* filling Modified File Table in */
+            for (let i = 0; i <= 3; i++) {
+                if(i == 0) {
+                    let cell0 = row.insertCell(0);
+                    cell0.innerHTML=data[k].file_name;
+                }
+                else if(i == 1) {
+                    let cell1 = row.insertCell(1);
+                    cell1.innerHTML=data[k].num_of_changes;
+                    
+                }
+                else if(i == 2) {
+                    let cell2 = row.insertCell(2);
+                    cell2.innerHTML=data[k].most_recent_modification_date;
+                }
+                else if(i == 3) {
+                    let cell3 = row.insertCell(3);
+                    cell3.innerHTML=data[k].file_size;
+                }
+            }
+        }    
+        },
+        fail: function (error) {
+            console.log("queryDisplayFiles Error!");
+            console.log(error);
+        }
+    });
+}
+
+/* display files between spesific dates */
+$('#displayBetweenModifiedDates').click(function(e){
+
+    console.log("Displaying between modified dates!");
+    let firstDate = $('#modifiedStartDate').val();
+    let secondDate = $('#modifiedEndDate').val();
+    let dates = firstDate + "+" + secondDate;
+    e.preventDefault();
+    myURL = '/queryDisplayBetweenModifiedDates';
+
+    if(firstDate == "" || secondDate == "") alert("Please enter dates!");
+    else populateModifiedFilesTable(myURL, dates);    
+});
+/* display files by NAME */
+$('#displayByModifiedName').click(function(e){
+
+    console.log("Displaying by modified names!");
+    let firstDate = $('#modifiedStartDate').val();
+    let secondDate = $('#modifiedEndDate').val();
+    let dates = firstDate + "+" + secondDate;
+    e.preventDefault();
+    myURL = '/queryDisplayBetweenModifiedDates';
+    if(firstDate == "" || secondDate == "") alert("Please enter dates!");
+    else populateModifiedFilesTable(myURL, dates, "sortByName");    
+});
+/* display files by SIZE */
+$('#displayByModifiedSize').click(function(e){
+
+    console.log("Displaying by modified size!");
+    let firstDate = $('#modifiedStartDate').val();
+    let secondDate = $('#modifiedEndDate').val();
+    let dates = firstDate + "+" + secondDate;
+    e.preventDefault();
+    myURL = '/queryDisplayBetweenModifiedDates';
+    if(firstDate == "" || secondDate == "") alert("Please enter dates!");
+    else populateModifiedFilesTable(myURL, dates, "sortBySize");
+    
+}); 
+/* display files by MOST RECENT date */
+$('#displayByMostRecentDate').click(function(e){
+
+    console.log("Displaying by most recent date!");
+    let firstDate = $('#modifiedStartDate').val();
+    let secondDate = $('#modifiedEndDate').val();
+    let dates = firstDate + "+" + secondDate;
+    e.preventDefault();
+    myURL = '/queryDisplayBetweenModifiedDates';
+    if(firstDate == "" || secondDate == "") alert("Please enter dates!");
+    else populateModifiedFilesTable(myURL, dates, "sortByDate");
+    
+}); 
 
 function createQueryTable(table) {
     let tableHead = table.createTHead();
@@ -1261,7 +1390,43 @@ function createQueryTable(table) {
     table.appendChild(tableHead);
 }
 
+/* Display all files modified between specific dates */
 
+function createModifiedFileTable(table) {
+    let tableHead = table.createTHead();
+            
+    /* Creating rows of the panel. */
+    let firstRow = document.createElement('tr');
 
+    /* Creating section names of the table */
+    let file_name = document.createElement('th');            
+    let num_of_changes = document.createElement('th');
+    let most_recent_modification_date = document.createElement('th');
+    let file_size = document.createElement('th');
+
+    /* Creating text of sections */            
+    let firstColumn = document.createTextNode('file_name');
+    let secondColumn = document.createTextNode('num_of_changes');
+    let thirdColumn = document.createTextNode('most_recent_modification_date');
+    let fourthColumn = document.createTextNode('file_size');
+
+    /* setting section names */
+    file_name.appendChild(firstColumn);            
+    num_of_changes.appendChild(secondColumn);
+    most_recent_modification_date.appendChild(thirdColumn);
+    file_size.appendChild(fourthColumn);
+
+    /* Setting sections to rows */
+    firstRow.appendChild(file_name);
+    firstRow.appendChild(num_of_changes);
+    firstRow.appendChild(most_recent_modification_date);
+    firstRow.appendChild(file_size);
+
+    /* Setting rows to the table head */
+    tableHead.appendChild(firstRow);
+            
+    /* Appending to the panel */
+    table.appendChild(tableHead);
+}
 
 });

@@ -1260,6 +1260,84 @@ async function executeQuery(fileQuery, res) {
   
 }
 
+/* display files between spesific dates */
+app.get('/queryDisplayBetweenModifiedDates', function(req, res) {
+
+  let startDate = req.query.first_date;
+  let endDate = req.query.second_date;
+  let sortType = req.query.sortType;
+
+  // getting file names
+  let modifiedFiles = "select a.svg_id, a.file_name, a.file_size, MAX(b.change_time) as maxTime, COUNT(b.svg_id) as changeNum \
+  from FILE a INNER JOIN IMG_CHANGE b \
+    WHERE (SELECT max(b.change_time) From IMG_CHANGE \
+      WHERE (a.svg_id = b.svg_id) AND (change_time BETWEEN '"+ startDate +"' AND '"+ endDate+"')) \
+        GROUP BY b.svg_id ";
+
+  let sortByFileName = "ORDER BY file_name";
+  let sortBySize = "ORDER BY file_size";
+  let sortByDate = "ORDER BY maxTime";
+
+  if(sortType == "sortByName") modifiedFiles = modifiedFiles + sortByFileName;
+  else if(sortType == "sortBySize") modifiedFiles = modifiedFiles + sortBySize;
+  else if(sortType == "sortByDate") modifiedFiles = modifiedFiles + sortByDate;
+
+
+  executeQueryForModifiedFileTable(modifiedFiles,  res);
+  
+});
+
+async function executeQueryForModifiedFileTable(modifiedFiles, res) {
+  // get the client
+  const mysql = require('mysql2/promise');
+
+  let connection;
+  
+  try{
+      // create the connection
+      connection = await mysql.createConnection(dbConnection);
+
+      
+      //Populate the table      
+      const [files] = await connection.execute(modifiedFiles);
+
+
+      var myStack = [];
+
+      for (var i in files) {
+
+          // file_name
+          let file_name = files[i].file_name;
+         
+          // num_of_changes
+          let num_of_changes = files[i].changeNum;
+          
+          // recent date          
+          let latest_date = files[i].maxTime.toISOString().slice(0, 11).replace('T', ' ') + files[i].maxTime.toString().slice(16, 24);
+
+          // file size
+          let file_size = files[i].file_size;
+          
+          var myJson = {
+            file_name: file_name,
+            num_of_changes: num_of_changes,
+            most_recent_modification_date: latest_date,
+            file_size: file_size
+          };  
+
+          myStack.push(myJson);         
+      
+        }   
+      res.send(myStack);
+  
+  }catch(e){
+      console.log("Query error: "+e);
+  }finally {
+      if (connection && connection.end) connection.end();
+  }
+  
+}
+
 let dbConf = {
 	host     : 'dursley.socs.uoguelph.ca',
 	user     : 'aogutala',

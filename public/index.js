@@ -1333,6 +1333,259 @@ $('#displayByMostRecentDate').click(function(e){
     
 }); 
 
+/* ************ Query 4 ************ */
+var selected_item = "";
+    document.getElementById('displayShape').addEventListener('change', shapeCounts, true);
+
+    function shapeCounts(drpdwn) {
+                
+        selected_item = drpdwn.currentTarget.value;
+        
+        let shape_bttn=document.getElementById("displayShapeCountsBttn");
+        shape_bttn.innerHTML = selected_item;
+        
+    }
+$('#shapeCountsForm').submit(function(e){      
+    console.log("Displaying files with shape counts in range!");
+    if((selected_item == "") || (selected_item == "None")) alert("Please spesify the shape!");
+            
+    let firstRange = $('#firstRange').val();
+    let secondRange = $('#secondRange').val();
+
+    e.preventDefault();
+    $.ajax({
+
+        type: 'get',
+        dataType: 'json',
+        url: '/shapeCounts',
+        data: { 
+            file_name: "",
+            file_title: "",
+            file_description: "",
+            n_rect: "0",
+            n_circ: "0",
+            n_path: "0",
+            n_group: "0",
+            creation_time: "0",
+            file_size: "0",
+            shapeCounts: "0",
+            shapeType: selected_item,
+            firstRange: firstRange,
+            secondRange: secondRange,
+            sortType: ""
+        },
+        success: function (data) {
+            console.log(data);
+            /* Creating Query Table */
+            var table=document.getElementById("queryTable");
+            table.innerHTML = "";            
+            
+            createShapeCountsTable(table);
+            populateShapeCountsTable(data, table);
+        },
+        fail: function(error) {
+            console.log("Error adding component!");
+            console.log(error);
+        }
+        
+    });
+});
+
+$('#shapeCountSortByName').click(function(e){      
+    console.log("Displaying files with shape counts in range!");
+    let firstRange = $('#firstRange').val();
+    let secondRange = $('#secondRange').val();
+    if((selected_item == "") || (selected_item == "None")) alert("Please spesify the shape!");             
+    else if( (firstRange == "") || (secondRange == "")) alert("Please enter range number!");
+    else {
+    e.preventDefault();
+    $.ajax({
+
+        type: 'get',
+        dataType: 'json',
+        url: '/shapeCounts',
+        data: { 
+            file_name: "",
+            file_title: "",
+            file_description: "",
+            n_rect: "0",
+            n_circ: "0",
+            n_path: "0",
+            n_group: "0",
+            creation_time: "0",
+            file_size: "0",
+            shapeCounts: "0",
+            shapeType: selected_item,
+            firstRange: firstRange,
+            secondRange: secondRange,
+            sortType: "sortByName"
+        },
+        success: function (data) {
+            console.log(data);
+            /* Creating Query Table */
+            var table=document.getElementById("queryTable");
+            table.innerHTML = "";            
+            
+            createShapeCountsTable(table);
+            populateShapeCountsTable(data, table);
+        },
+        fail: function(error) {
+            console.log("Error adding component!");
+            console.log(error);
+        }
+        
+    });
+}
+});
+
+$('#shapeCountSortBySize').click(function(e){      
+    console.log("Displaying files with shape counts in range!");
+    let firstRange = $('#firstRange').val();
+    let secondRange = $('#secondRange').val();
+    if((selected_item == "") || (selected_item == "None")) alert("Please spesify the shape!");             
+    else if( (firstRange == "") || (secondRange == "")) alert("Please enter range number!");
+    else {
+    e.preventDefault();
+    $.ajax({
+
+        type: 'get',
+        dataType: 'json',
+        url: '/shapeCounts',
+        data: { 
+            file_name: "",
+            file_title: "",
+            file_description: "",
+            n_rect: "0",
+            n_circ: "0",
+            n_path: "0",
+            n_group: "0",
+            creation_time: "0",
+            file_size: "0",
+            shapeCounts: "0",
+            shapeType: selected_item,
+            firstRange: firstRange,
+            secondRange: secondRange,
+            sortType: "sortBySize"
+        },
+        success: function (data) {
+            console.log(data);
+            /* Creating Query Table */
+            var table=document.getElementById("queryTable");
+            table.innerHTML = "";            
+            
+            createShapeCountsTable(table);
+            populateShapeCountsTable(data, table);
+        },
+        fail: function(error) {
+            console.log("Error adding component!");
+            console.log(error);
+        }
+        
+    });
+}
+});
+
+$('#sortByShapeCount').click(function(e){      
+    console.log("Displaying files with shape counts in range!");
+    let firstRange = $('#firstRange').val();
+    let secondRange = $('#secondRange').val();
+    if((selected_item == "") || (selected_item == "None")) alert("Please spesify the shape!");             
+    else if( (firstRange == "") || (secondRange == "")) alert("Please enter range number!");
+    else {
+    e.preventDefault();
+    $.ajax({
+
+        type: 'get',
+        dataType: 'json',
+        url: '/shapeCounts',
+        data: { 
+            file_name: "",
+            file_title: "",
+            file_description: "",
+            n_rect: "0",
+            n_circ: "0",
+            n_path: "0",
+            n_group: "0",
+            creation_time: "0",
+            file_size: "0",
+            shapeCounts: "0",
+            shapeType: selected_item,
+            firstRange: firstRange,
+            secondRange: secondRange,
+            sortType: "sortByShapeCount"
+        },
+        success: function (data) {
+            console.log(data);
+            /* Creating Query Table */
+            var table=document.getElementById("queryTable");
+            table.innerHTML = "";            
+            
+            createShapeCountsTable(table);
+            populateShapeCountsTable(data, table);
+        },
+        fail: function(error) {
+            console.log("Error adding component!");
+            console.log(error);
+        }
+        
+    });
+}
+});
+
+function populateShapeCountsTable(data, table) {
+    
+    for(let k = 0; k < data.length; k++){     
+            
+        let len = table.rows.length;
+        var row = table.insertRow(len);
+
+        /* filling Execute Query Table in */
+        for (let i = 0; i <= 9; i++) {
+            if(i == 0) {
+                let cell0 = row.insertCell(0);
+                cell0.innerHTML=data[k].file_name;
+            }
+            else if(i == 1) {
+                let cell1 = row.insertCell(1);
+                cell1.innerHTML=data[k].file_title;
+                
+            }
+            else if(i == 2) {
+                let cell2 = row.insertCell(2);
+                cell2.innerHTML=data[k].file_description;
+            }
+            else if(i == 3) {
+                let cell3 = row.insertCell(3);
+                cell3.innerHTML=data[k].n_rect;
+            }
+            else if(i == 4) {
+                let cell4 = row.insertCell(4);
+                cell4.innerHTML=data[k].n_circ;
+            }
+            else if(i == 5) {
+                let cell5 = row.insertCell(5);
+                cell5.innerHTML=data[k].n_path;
+            }
+            else if(i == 6) {
+                let cell6 = row.insertCell(6);
+                cell6.innerHTML=data[k].n_group;
+            }
+            else if(i == 7) {
+                let cell7 = row.insertCell(7);
+                cell7.innerHTML=data[k].creation_time;
+            }
+            else if(i == 8) {
+                let cell8 = row.insertCell(8);
+                cell8.innerHTML=data[k].file_size;
+            }
+            else if(i == 9) {
+                let cell9 = row.insertCell(9);
+                cell9.innerHTML=data[k].shapeCounts;
+            }
+        }
+    }
+}
+
 function createQueryTable(table) {
     let tableHead = table.createTHead();
             
@@ -1421,6 +1674,67 @@ function createModifiedFileTable(table) {
     firstRow.appendChild(num_of_changes);
     firstRow.appendChild(most_recent_modification_date);
     firstRow.appendChild(file_size);
+
+    /* Setting rows to the table head */
+    tableHead.appendChild(firstRow);
+            
+    /* Appending to the panel */
+    table.appendChild(tableHead);
+}
+
+function createShapeCountsTable(table) {
+    let tableHead = table.createTHead();
+            
+    /* Creating rows of the panel. */
+    let firstRow = document.createElement('tr');
+
+    /* Creating section names of the table */
+    let file_name = document.createElement('th');            
+    let file_title = document.createElement('th');
+    let file_description = document.createElement('th');            
+    let n_rect = document.createElement('th');
+    let n_circ = document.createElement('th');
+    let n_path = document.createElement('th');
+    let n_group = document.createElement('th');
+    let creation_time = document.createElement('th');
+    let file_size = document.createElement('th');
+    let shape_counts = document.createElement('th');
+
+    /* Creating text of sections */            
+    let firstColumn = document.createTextNode('file_name');
+    let secondColumn = document.createTextNode('file_title');            
+    let thirdColumn = document.createTextNode('file_description');
+    let fifthColumn = document.createTextNode('n_rect');
+    let sixthColumn = document.createTextNode('n_circ');
+    let seventhColumn = document.createTextNode('n_path');
+    let eighthColumn = document.createTextNode('n_group');
+    let ninthColumn = document.createTextNode('creation_time');
+    let tenthColumn = document.createTextNode('file_size');
+    let eleventhColumn = document.createTextNode('shape_counts');
+
+    /* setting section names */
+    file_name.appendChild(firstColumn);            
+    file_title.appendChild(secondColumn);
+    file_description.appendChild(thirdColumn);            
+    n_rect.appendChild(fifthColumn);
+    n_circ.appendChild(sixthColumn);
+    n_path.appendChild(seventhColumn);
+    n_group.appendChild(eighthColumn);
+    creation_time.appendChild(ninthColumn);
+    file_size.appendChild(tenthColumn);
+    shape_counts.appendChild(eleventhColumn);
+
+    /* Setting sections to rows */
+    firstRow.appendChild(file_name);
+    firstRow.appendChild(file_title);
+    firstRow.appendChild(file_description);
+    firstRow.appendChild(n_rect);
+    firstRow.appendChild(n_circ);
+    firstRow.appendChild(n_path);
+    firstRow.appendChild(n_group);
+    firstRow.appendChild(creation_time);
+    firstRow.appendChild(file_size);
+    firstRow.appendChild(shape_counts);
 
     /* Setting rows to the table head */
     tableHead.appendChild(firstRow);

@@ -415,6 +415,37 @@
         </form>
     </div>
 
+    <hr>
+        <h3 class="myHeaders" id="query4">Query 4</h3>
+    <hr>
+    <!-- Drop Down List -->   
+    <div class="dropdown">
+        <button id="displayShapeCountsBttn" class="dropbtn">List of Shapes</button>
+        <select id="displayShape" class="dropdown-content">
+            <option value="None">-- Select --</option>
+            <option value="rectangles">rectangles</option>
+            <option value="circles">circles</option>
+            <option value="paths">paths</option>
+            <option value="groups">groups</option>
+        </select>
+    </div>
+
+        <h10 id="textForShapeCounts">Please choose a shape</h10>
+    <div class="form-popup" id="shapeCountsForm">
+        <form action="" class="form-container" id='shapeCountsForm'>
+            
+            <label class="addShape" for="rectX"><b>range1:</b></label>
+            <input class="addShape" type="number" id="firstRange" placeholder="First Range" name="firstRange" min="0" required>
+            <label class="addShape" for="rectX"><b>range2:</b></label>
+            <input class="addShape" type="number" id="secondRange" placeholder="Second Range" name="secondRange" min="0" required>
+            <input type='submit' value="Display Files in Range" class="btn btn-secondary"></input>
+            <input type='reset' value="Sort by Name" id="shapeCountSortByName" class="btn btn-secondary"></input>
+            <input type='reset' value="Sort by Size" id="shapeCountSortBySize" class="btn btn-secondary"></input>
+            <input type='reset' value="Sort by Shape Count" id="sortByShapeCount" class="btn btn-secondary"></input>
+
+        </form>
+    </div>
+
     <p></p>
     <footer>Abdullah Ogutalan * 1109732 * aogutala@uoguelph.ca </footer>
 

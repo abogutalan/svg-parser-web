@@ -1276,7 +1276,7 @@ app.get('/queryDisplayBetweenModifiedDates', function(req, res) {
 
   let sortByFileName = "ORDER BY file_name";
   let sortBySize = "ORDER BY file_size";
-  let sortByDate = "ORDER BY maxTime";
+  let sortByDate = "ORDER BY maxTime DESC";
 
   if(sortType == "sortByName") modifiedFiles = modifiedFiles + sortByFileName;
   else if(sortType == "sortBySize") modifiedFiles = modifiedFiles + sortBySize;
@@ -1337,6 +1337,91 @@ async function executeQueryForModifiedFileTable(modifiedFiles, res) {
   }
   
 }
+
+
+app.get('/shapeCounts', function(req, res){
+  let shapeType = req.query.shapeType;
+  let sortType = req.query.sortType;
+  let firstRange = req.query.firstRange;
+  let secondRange = req.query.secondRange;
+  
+  var fileQuery = "";   
+
+  if(shapeType == "rectangles") fileQuery = "SELECT * FROM FILE WHERE n_rect BETWEEN "+firstRange+" AND "+secondRange;
+  else if(shapeType == "circles") fileQuery = "SELECT * FROM FILE WHERE n_circ BETWEEN "+firstRange+" AND "+secondRange;
+  else if(shapeType == "paths") fileQuery = "SELECT * FROM FILE WHERE n_path BETWEEN "+firstRange+" AND "+secondRange;
+  else if(shapeType == "groups") fileQuery = "SELECT * FROM FILE WHERE n_group BETWEEN "+firstRange+" AND "+secondRange;
+  
+  if(sortType == "sortByName") fileQuery = fileQuery + " ORDER BY file_name";
+  else if(sortType == "sortBySize") fileQuery = fileQuery + " ORDER BY file_size";
+  else if(sortType == "sortByShapeCount") {
+    if(shapeType == "rectangles") fileQuery = fileQuery = fileQuery + " ORDER BY n_rect";
+    else if(shapeType == "circles") fileQuery = fileQuery + " ORDER BY n_circ";
+    else if(shapeType == "paths") fileQuery = fileQuery + " ORDER BY n_path";
+    else if(shapeType == "groups") fileQuery = fileQuery + " ORDER BY n_group";
+  }
+
+  async function main() {
+    // get the client
+    const mysql = require('mysql2/promise');
+
+    let connection;
+    
+    try{
+        // create the connection
+        connection = await mysql.createConnection(dbConnection);
+        //Populate the table
+        const [files] = await connection.execute(fileQuery);
+
+        let stack = [];
+        for (var i in files) {
+          let file_name = files[i].file_name;
+          let file_title = files[i].file_title;
+          let file_description = files[i].file_description;
+          let n_rect = files[i].n_rect;
+          let n_circ = files[i].n_circ;
+          let n_path = files[i].n_path;
+          let n_group = files[i].n_group;
+          let creation_time = files[i].creation_time;
+          creation_time = creation_time.toISOString().slice(0, 19).replace('T', ' ');
+          let file_size = files[i].file_size;
+
+          let shape_count = 0;
+          if(shapeType == "rectangles") shape_count = files[i].n_rect;
+          else if(shapeType == "circles") shape_count = files[i].n_circ;
+          else if(shapeType == "paths") shape_count = files[i].n_path;
+          else if(shapeType == "groups") shape_count = files[i].n_group;
+          
+          var myJson = {
+            file_name: file_name,
+            file_title: file_title,
+            file_description: file_description,
+            n_rect: n_rect,
+            n_circ: n_circ,
+            n_path: n_path,
+            n_group: n_group,
+            creation_time: creation_time,
+            file_size: file_size,
+            shapeCounts: shape_count
+          };  
+            stack.push(myJson);
+          }
+      
+        res.send(stack);
+
+    }catch(e){
+        console.log("Query error: "+e);
+    }finally {
+        if (connection && connection.end) connection.end();
+    }
+    
+  }
+  // providing selected shape is defined
+  if((shapeType != "") && (shapeType != "None")) main();
+
+  
+
+});
 
 let dbConf = {
 	host     : 'dursley.socs.uoguelph.ca',

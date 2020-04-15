@@ -430,7 +430,7 @@ app.post('/newSVG', function(req, res) {
     if((".svg" === extension) && (filename.length != 0)) {
       sharedLib.createNewSVGobject("./uploads/" + filename, title, description);
       insertIntoFileTable(filename);
-      trackChanges_CreateNewSVG(filename);
+      //trackChanges_CreateNewSVG(filename);  // Note: teken out because no need to update IMG_CHANGE table for creation
     }
     else console.log("Invalid extension or empty file name ERROR !");
   })
@@ -924,6 +924,7 @@ app.post('/db_logIn', function(req, res) {
     
         }catch(e){
             console.log("Query error: "+e);
+            console.log("Error while logging in! ");
         }finally {
             if (connection && connection.end) connection.end();
         }        
@@ -1572,8 +1573,11 @@ app.get('/getFileNames', function(req, res) {
 
 app.get('/getChangeType', function(req, res) {
 
-  let fileQuery = "SELECT change_type FROM IMG_CHANGE GROUP BY change_type";   
   let changeType = "";
+  let filename = req.query.filename;
+
+  let fileQuery = "SELECT change_type  FROM IMG_CHANGE a INNER JOIN FILE b \
+  WHERE (a.svg_id = b.svg_id) AND (b.file_name = '"+filename+"') GROUP BY change_type";     
   
   async function main() {
     // get the client
@@ -1616,12 +1620,16 @@ app.get('/queryDisplayChanges', function(req, res) {
   let changeType = req.query.change_type;
   let startDate = req.query.first_date;
   let endDate = req.query.second_date;
+  let command = req.query.command;
 
   let summary = "", changeDate = "";
 
   let fileQuery = "SELECT a.file_name, b.change_type, b.change_summary, b.change_time \
-  FROM FILE a INNER JOIN IMG_CHANGE b WHERE (a.svg_id = b.svg_id) AND (file_name = 'filename.svg') \
-  AND (change_type = 'add rect') AND (change_time BETWEEN '2020-04-15 00:38:48' AND '2020-04-16 00:00:00')";   
+  FROM FILE a INNER JOIN IMG_CHANGE b WHERE (a.svg_id = b.svg_id) AND (file_name = '"+fileName+"') \
+  AND (change_type = '"+changeType+"') AND (change_time BETWEEN '"+ startDate +"' AND '"+ endDate +"')";   
+
+  if(command == "Recent change first") fileQuery = fileQuery + "ORDER BY change_time DESC";
+  else if(command == "Recent change last") fileQuery = fileQuery + "ORDER BY change_time";
   
   async function main() {
     // get the client
@@ -1641,7 +1649,7 @@ app.get('/queryDisplayChanges', function(req, res) {
         fileName = file[i].file_name;
         changeType = file[i].change_type;
         summary = file[i].change_summary;
-        changeDate = file[i].change_time;
+        changeDate = file[i].change_time.toISOString().slice(0, 11).replace('T', ' ') + file[i].change_time.toString().slice(16, 24);
 
         var myJson = {
             file_name: fileName,            

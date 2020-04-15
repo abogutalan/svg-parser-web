@@ -1,6 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
+<head link rel="shortcut icon" href="../src/assets/img/favicon.ico">
     <title>CHANGE ME</title>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -481,6 +481,16 @@
         <h3 class="myHeaders" id="query6">Query 6</h3>
     <hr> 
     
+    <h5 class="shapeHeaders"> Please select a command </h5>     
+                
+    
+    <input type="radio" name="command" value="Display all changes"> Display all changes <br>
+    <input type="radio" name="command" value="Recent change first"> Recent change first <br>
+    <input type="radio" name="command" value="Recent change last"> Recent change last 
+      
+    <br> 
+    <br> 
+
     <div class="dropdown">
         <button id="changesListNamesBttn" class="dropbtn">Choose File Name</button>
         <select id="changesListNames" class="dropdown-content">
@@ -503,9 +513,9 @@
         <form action="" class="form-container" id='changesForm'>            
             
             <label class="addShape" for="startDate"><b>Start Date:</b></label>
-            <input class="addShape" type="number" id="startDate" placeholder="YYYY-MM-DD hh:mm:ss" name="startDate" min="0" required>
+            <input class="addShape" type="text" id="startDate" placeholder="YYYY-MM-DD hh:mm:ss" name="startDate" required>
             <label class="addShape" for="endDate"><b>End Date:</b></label>
-            <input class="addShape" type="number" id="endDate" placeholder="YYYY-MM-DD hh:mm:ss" name="endDate" min="0" required>
+            <input class="addShape" type="text" id="endDate" placeholder="YYYY-MM-DD hh:mm:ss" name="endDate" required>
             <br>
             <input type='submit' value="Run" id="displayChanges" class="btn btn-secondary"></input>
 

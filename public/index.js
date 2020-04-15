@@ -695,7 +695,6 @@ $(document).ready(function() {
         location.reload(true);
     });
 
-    var click_counter = 0;
     $('#newSVGForm').submit(function(e){
         
         console.log("Create SVG button clicked!");
@@ -719,15 +718,8 @@ $(document).ready(function() {
                 console.log(error);
             }
         });
-        click_counter++;
-        if(click_counter == 1) {
-            alert("Please click Create SVG button again to update File Log and IMG_CHANGE table");
-        }
-        else if (click_counter == 2) {
-            location.reload(true);
-            click_counter = 0;
-        }
-        //location.reload(true); 
+        
+        location.reload(true); 
         
     });
 
@@ -749,11 +741,7 @@ $(document).ready(function() {
         console.log("add Rect button clicked!");
 
         let val_X = $('#rectX').val();
-
-        if (val_X == 7) {
-            val_X++;
-        }
-                
+     
         e.preventDefault();
         $.ajax({
 
@@ -784,11 +772,7 @@ $(document).ready(function() {
         console.log("add Circle button clicked!");
 
         let val_X = $('#circleX').val();
-
-        if (val_X == 7) {
-            val_X++;
-        }
-                
+     
         e.preventDefault();
         $.ajax({
 
@@ -1174,6 +1158,12 @@ $('#displayBetweenDates').click(function(e){
     e.preventDefault();
     myURL = '/queryDisplayBetweenDates';
     if(firstDate == "" || secondDate == "") alert("Please enter dates!");
+    else if (isDateValid(firstDate) == 0) {
+        alert("Start Date format must be YYYY-MM-DD hh:mm:ss");
+    }
+    else if (isDateValid(secondDate) == 0) {
+        alert("End Date format must be YYYY-MM-DD hh:mm:ss");
+    } 
     else populateExecuteQueryTable(myURL, dates);    
 });
 /* display files by name */
@@ -1186,6 +1176,12 @@ $('#displayByName').click(function(e){
     e.preventDefault();
     myURL = '/queryDisplayByNames';
     if(firstDate == "" || secondDate == "") alert("Please enter dates!");
+    else if (isDateValid(firstDate) == 0) {
+        alert("Start Date format must be YYYY-MM-DD hh:mm:ss");
+    }
+    else if (isDateValid(secondDate) == 0) {
+        alert("End Date format must be YYYY-MM-DD hh:mm:ss");
+    } 
     else populateExecuteQueryTable(myURL, dates);    
 });
 /* display files by size */
@@ -1198,6 +1194,12 @@ $('#displayBySize').click(function(e){
     e.preventDefault();
     myURL = '/queryDisplayBySize';
     if(firstDate == "" || secondDate == "") alert("Please enter dates!");
+    else if (isDateValid(firstDate) == 0) {
+        alert("Start Date format must be YYYY-MM-DD hh:mm:ss");
+    }
+    else if (isDateValid(secondDate) == 0) {
+        alert("End Date format must be YYYY-MM-DD hh:mm:ss");
+    } 
     else populateExecuteQueryTable(myURL, dates);
     
 }); 
@@ -1211,6 +1213,12 @@ $('#displayByCreationDate').click(function(e){
     e.preventDefault();
     myURL = '/queryDisplayByDate';
     if(firstDate == "" || secondDate == "") alert("Please enter dates!");
+    else if (isDateValid(firstDate) == 0) {
+        alert("Start Date format must be YYYY-MM-DD hh:mm:ss");
+    }
+    else if (isDateValid(secondDate) == 0) {
+        alert("End Date format must be YYYY-MM-DD hh:mm:ss");
+    } 
     else populateExecuteQueryTable(myURL, dates);
     
 }); 
@@ -1293,6 +1301,12 @@ $('#displayBetweenModifiedDates').click(function(e){
     myURL = '/queryDisplayBetweenModifiedDates';
 
     if(firstDate == "" || secondDate == "") alert("Please enter dates!");
+    else if (isDateValid(firstDate) == 0) {
+        alert("Start Date format must be YYYY-MM-DD hh:mm:ss");
+    }
+    else if (isDateValid(secondDate) == 0) {
+        alert("End Date format must be YYYY-MM-DD hh:mm:ss");
+    } 
     else populateModifiedFilesTable(myURL, dates);    
 });
 /* display files by NAME */
@@ -1305,6 +1319,12 @@ $('#displayByModifiedName').click(function(e){
     e.preventDefault();
     myURL = '/queryDisplayBetweenModifiedDates';
     if(firstDate == "" || secondDate == "") alert("Please enter dates!");
+    else if (isDateValid(firstDate) == 0) {
+        alert("Start Date format must be YYYY-MM-DD hh:mm:ss");
+    }
+    else if (isDateValid(secondDate) == 0) {
+        alert("End Date format must be YYYY-MM-DD hh:mm:ss");
+    } 
     else populateModifiedFilesTable(myURL, dates, "sortByName");    
 });
 /* display files by SIZE */
@@ -1317,6 +1337,12 @@ $('#displayByModifiedSize').click(function(e){
     e.preventDefault();
     myURL = '/queryDisplayBetweenModifiedDates';
     if(firstDate == "" || secondDate == "") alert("Please enter dates!");
+    else if (isDateValid(firstDate) == 0) {
+        alert("Start Date format must be YYYY-MM-DD hh:mm:ss");
+    }
+    else if (isDateValid(secondDate) == 0) {
+        alert("End Date format must be YYYY-MM-DD hh:mm:ss");
+    } 
     else populateModifiedFilesTable(myURL, dates, "sortBySize");
     
 }); 
@@ -1330,6 +1356,12 @@ $('#displayByMostRecentDate').click(function(e){
     e.preventDefault();
     myURL = '/queryDisplayBetweenModifiedDates';
     if(firstDate == "" || secondDate == "") alert("Please enter dates!");
+    else if (isDateValid(firstDate) == 0) {
+        alert("Start Date format must be YYYY-MM-DD hh:mm:ss");
+    }
+    else if (isDateValid(secondDate) == 0) {
+        alert("End Date format must be YYYY-MM-DD hh:mm:ss");
+    } 
     else populateModifiedFilesTable(myURL, dates, "sortByDate");
     
 }); 
@@ -1695,18 +1727,34 @@ changeTypeDropDown.addEventListener('change', changeTypeUpdate, true);
         change_type_bttn.innerHTML = selected_change_type;        
     }
 
+
+
 $('#changesForm').submit(function(e){
 
-    console.log("Displaying most frequently downlaod files!");
-    if((selected_file_name == "") || (selected_file_name == "None")) alert("Please select a file name!");
-    else if((selected_change_type == "") || (selected_change_type == "None")) alert("Please select a change type!");
-            
+    console.log("Displaying all changes of a specific type to a specific file between specific dates!");
+    e.preventDefault();
+
     let startDate = $('#startDate').val();
     let endDate = $('#endDate').val();
-    let sortType = "";
+    let command = getRadioButtonValue('command');
+
+    if((selected_file_name == "") || (selected_file_name == "None")) alert("Please select a file name!");
+    else if((selected_change_type == "") || (selected_change_type == "None")) alert("Please select a change type!");
+    else if (isDateValid(startDate) == 0) {
+        alert("Start Date format must be YYYY-MM-DD hh:mm:ss");
+    }
+    else if (isDateValid(endDate) == 0) {
+        alert("End Date format must be YYYY-MM-DD hh:mm:ss");
+    }
+    else if (command == "") {
+        alert("Please select a command via Radio Button!");
+    } 
+    else queryDisplayChanges(startDate, endDate, command);
     
-    e.preventDefault();
     
+}); 
+
+function queryDisplayChanges(startDate, endDate, command){
     myURL = '/queryDisplayChanges';
     $.ajax({
         type: 'get',
@@ -1719,7 +1767,7 @@ $('#changesForm').submit(function(e){
             change_time: "",
             first_date: startDate,
             second_date: endDate,
-            sortType: sortType
+            command: command
         },
         success: function(data) { 
 
@@ -1761,8 +1809,7 @@ $('#changesForm').submit(function(e){
             console.log(error);
         }
     });
-    
-}); 
+}
 
 $('#changesListNamesBttn').click(function(e){
     e.preventDefault();
@@ -1796,13 +1843,17 @@ $('#changesListNamesBttn').click(function(e){
 
 $('#changesTypeBttn').click(function(e){
     e.preventDefault();
-    $.ajax({
 
+    if ( selected_file_name == "") alert("Please select a file name first!");
+    else{
+    
+    $.ajax({
         type: 'get',
         dataType: 'json',
         url: '/getChangeType',
         data: { 
-            change_type: ""            
+            change_type: "",
+            filename: selected_file_name           
         },
         success: function (data) {
             console.log(data);
@@ -1822,6 +1873,7 @@ $('#changesTypeBttn').click(function(e){
         }
         
     });
+}
 });
 
     
@@ -2050,6 +2102,28 @@ function createChangesTable(table) {
             
     /* Appending to the panel */
     table.appendChild(tableHead);
+}
+
+function isDateValid(date){
+
+    let val = date.trim();
+   
+    if(val.charAt(4) != '-') return 0;
+    else if(val.charAt(7) != '-') return 0;
+    else if(val.charAt(10) != ' ') return 0;
+    else if(val.charAt(13) != ':') return 0;
+    else if(val.charAt(16) != ':') return 0;
+    else return 1;
+}
+
+function getRadioButtonValue(name){
+    var ele = document.getElementsByName(name); 
+    let selectedVal = "";         
+    for(i = 0; i < ele.length; i++) { 
+        if(ele[i].checked) 
+            selectedVal = ele[i].value; 
+    } 
+    return selectedVal;
 }
 
 });

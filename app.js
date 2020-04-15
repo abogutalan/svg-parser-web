@@ -1529,6 +1529,141 @@ app.get('/querySortDownloadsByName', function(req, res) {
   main();  
 });
 
+/* query 6 */
+app.get('/getFileNames', function(req, res) {
+
+  let fileQuery = "SELECT file_name FROM FILE a INNER JOIN IMG_CHANGE b WHERE (a.svg_id = b.svg_id) GROUP BY file_name";   
+  let fileName = "";
+  
+  async function main() {
+    // get the client
+    const mysql = require('mysql2/promise');
+
+    let connection;
+    
+    try{
+        // create the connection
+        connection = await mysql.createConnection(dbConnection);
+        //Populate the table
+        const [file] = await connection.execute(fileQuery);
+
+        let stack = [];
+        for (var i in file){
+        
+        fileName = file[i].file_name;
+
+        var myJson = {
+          file_name: fileName          
+        };  
+        stack.push(myJson);
+      }
+    res.send(stack);
+
+    }catch(e){
+        console.log("Query error: "+e);
+    }finally {
+        if (connection && connection.end) connection.end();
+    }
+    
+  }
+  main();
+  
+});
+
+app.get('/getChangeType', function(req, res) {
+
+  let fileQuery = "SELECT change_type FROM IMG_CHANGE GROUP BY change_type";   
+  let changeType = "";
+  
+  async function main() {
+    // get the client
+    const mysql = require('mysql2/promise');
+
+    let connection;
+    
+    try{
+        // create the connection
+        connection = await mysql.createConnection(dbConnection);
+        //Populate the table
+        const [file] = await connection.execute(fileQuery);
+
+        let stack = [];
+        for (var i in file){
+        
+          changeType = file[i].change_type;
+
+        var myJson = {
+          change_type: changeType          
+        };  
+        stack.push(myJson);
+      }
+    res.send(stack);
+
+    }catch(e){
+        console.log("Query error: "+e);
+    }finally {
+        if (connection && connection.end) connection.end();
+    }
+    
+  }
+  main();
+  
+});
+
+app.get('/queryDisplayChanges', function(req, res) {
+
+  let fileName = req.query.file_name;
+  let changeType = req.query.change_type;
+  let startDate = req.query.first_date;
+  let endDate = req.query.second_date;
+
+  let summary = "", changeDate = "";
+
+  let fileQuery = "SELECT a.file_name, b.change_type, b.change_summary, b.change_time \
+  FROM FILE a INNER JOIN IMG_CHANGE b WHERE (a.svg_id = b.svg_id) AND (file_name = 'filename.svg') \
+  AND (change_type = 'add rect') AND (change_time BETWEEN '2020-04-15 00:38:48' AND '2020-04-16 00:00:00')";   
+  
+  async function main() {
+    // get the client
+    const mysql = require('mysql2/promise');
+
+    let connection;
+    
+    try{
+        // create the connection
+        connection = await mysql.createConnection(dbConnection);
+        //Populate the table
+        const [file] = await connection.execute(fileQuery);
+
+        let stack = [];
+        for (var i in file){
+        
+        fileName = file[i].file_name;
+        changeType = file[i].change_type;
+        summary = file[i].change_summary;
+        changeDate = file[i].change_time;
+
+        var myJson = {
+            file_name: fileName,            
+            change_type: changeType,
+            change_summary: summary,
+            change_time: changeDate,          
+        };  
+        stack.push(myJson);
+      }
+    res.send(stack);
+
+    }catch(e){
+        console.log("Query error: "+e);
+    }finally {
+        if (connection && connection.end) connection.end();
+    }
+    
+  }
+  main();
+  
+});
+
 let dbConf = {
 	host     : 'dursley.socs.uoguelph.ca',
 	user     : 'aogutala',

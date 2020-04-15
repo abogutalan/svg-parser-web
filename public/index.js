@@ -196,6 +196,7 @@ $(document).ready(function() {
                 scaleShapeDropDown.add(option);
             }
 
+
             document.getElementById('mySelect').addEventListener('change', update, true);
             let curVal;
             function update(dropDownList) {
@@ -1673,7 +1674,157 @@ $('#sortByCount').click(function(e){
     
 }); 
 
+/* ************ Query 5 ************ */
+/* drop down for file names */
+var changesListDropDown = document.getElementById("changesListNames");
+var changeTypeDropDown = document.getElementById("changesType");
 
+var selected_file_name = "";
+var selected_change_type = "";
+
+changesListDropDown.addEventListener('change', fileNameUpdate, true);
+    function fileNameUpdate(drpdwn) {                
+        selected_file_name = drpdwn.currentTarget.value;        
+        let name_bttn=document.getElementById("changesListNamesBttn");
+        name_bttn.innerHTML = selected_file_name;        
+    }
+changeTypeDropDown.addEventListener('change', changeTypeUpdate, true);
+    function changeTypeUpdate(drpdwn) {                
+        selected_change_type = drpdwn.currentTarget.value;        
+        let change_type_bttn=document.getElementById("changesTypeBttn");
+        change_type_bttn.innerHTML = selected_change_type;        
+    }
+
+$('#changesForm').submit(function(e){
+
+    console.log("Displaying most frequently downlaod files!");
+    if((selected_file_name == "") || (selected_file_name == "None")) alert("Please select a file name!");
+    else if((selected_change_type == "") || (selected_change_type == "None")) alert("Please select a change type!");
+            
+    let startDate = $('#startDate').val();
+    let endDate = $('#endDate').val();
+    let sortType = "";
+    
+    e.preventDefault();
+    
+    myURL = '/queryDisplayChanges';
+    $.ajax({
+        type: 'get',
+        dataType: 'json',
+        url: myURL,
+        data: {
+            file_name: selected_file_name,            
+            change_type: selected_change_type,
+            change_summary: "",
+            change_time: "",
+            first_date: startDate,
+            second_date: endDate,
+            sortType: sortType
+        },
+        success: function(data) { 
+
+            // Creating Query Table //
+            var table=document.getElementById("queryTable");
+            table.innerHTML = "";            
+            
+            createChangesTable(table);
+
+        for(let k = 0; k < data.length; k++){     
+            
+            let len = table.rows.length;
+            var row = table.insertRow(len);
+    
+            // filling Modified File Table in //
+            for (let i = 0; i <= 3; i++) {
+                if(i == 0) {
+                    let cell0 = row.insertCell(0);
+                    cell0.innerHTML=data[k].file_name;
+                }
+                else if(i == 1) {
+                    let cell1 = row.insertCell(1);
+                    cell1.innerHTML=data[k].change_type;
+                    
+                }
+                else if(i == 2) {
+                    let cell2 = row.insertCell(2);
+                    cell2.innerHTML=data[k].change_summary;
+                }
+                else if(i == 3) {
+                    let cell3 = row.insertCell(3);
+                    cell3.innerHTML=data[k].change_time;
+                }
+            }
+        }    
+        },
+        fail: function (error) {
+            console.log("queryDisplayFiles Error!");
+            console.log(error);
+        }
+    });
+    
+}); 
+
+$('#changesListNamesBttn').click(function(e){
+    e.preventDefault();
+    $.ajax({
+
+        type: 'get',
+        dataType: 'json',
+        url: '/getFileNames',
+        data: { 
+            file_name: ""            
+        },
+        success: function (data) {
+            console.log(data);
+            
+            /* populating changes list drop down for query 6*/
+            for (var i in data) {
+                let option = document.createElement("option");
+                option.value = data[i].file_name;
+                option.text = data[i].file_name;
+                changesListDropDown.add(option);
+            }
+            
+        },
+        fail: function(error) {
+            console.log("Error adding component!");
+            console.log(error);
+        }
+        
+    });
+});
+
+$('#changesTypeBttn').click(function(e){
+    e.preventDefault();
+    $.ajax({
+
+        type: 'get',
+        dataType: 'json',
+        url: '/getChangeType',
+        data: { 
+            change_type: ""            
+        },
+        success: function (data) {
+            console.log(data);
+            
+            /* populating changes list drop down for query 6*/
+            for (var i in data) {
+                let option = document.createElement("option");
+                option.value = data[i].change_type;
+                option.text = data[i].change_type;
+                changeTypeDropDown.add(option);
+            }
+            
+        },
+        fail: function(error) {
+            console.log("Error adding component!");
+            console.log(error);
+        }
+        
+    });
+});
+
+    
 function createQueryTable(table) {
     let tableHead = table.createTHead();
             
@@ -1856,6 +2007,43 @@ function create_N_FrequentlyDownloadedTable(table) {
     firstRow.appendChild(file_name);
     firstRow.appendChild(num_of_changes);
     firstRow.appendChild(most_recent_modification_date);
+
+    /* Setting rows to the table head */
+    tableHead.appendChild(firstRow);
+            
+    /* Appending to the panel */
+    table.appendChild(tableHead);
+}
+
+function createChangesTable(table) {
+    let tableHead = table.createTHead();
+            
+    /* Creating rows of the panel. */
+    let firstRow = document.createElement('tr');
+
+    /* Creating section names of the table */
+    let file_name = document.createElement('th');            
+    let change_type = document.createElement('th');
+    let change_summary = document.createElement('th');
+    let change_time = document.createElement('th');
+    
+    /* Creating text of sections */            
+    let firstColumn = document.createTextNode('file_name');
+    let secondColumn = document.createTextNode('change_type');
+    let thirdColumn = document.createTextNode('change_summary');
+    let fourthColumn = document.createTextNode('change_time');
+
+    /* setting section names */
+    file_name.appendChild(firstColumn);            
+    change_type.appendChild(secondColumn);
+    change_summary.appendChild(thirdColumn);
+    change_time.appendChild(fourthColumn);
+
+    /* Setting sections to rows */
+    firstRow.appendChild(file_name);
+    firstRow.appendChild(change_type);
+    firstRow.appendChild(change_summary);
+    firstRow.appendChild(change_time);
 
     /* Setting rows to the table head */
     tableHead.appendChild(firstRow);

@@ -397,6 +397,9 @@
         </form>
     </div>
 
+    <br>
+    <br>
+
     <hr>
         <h3 class="myHeaders" id="query3">Query 3</h3>
     <hr>
@@ -415,6 +418,9 @@
         </form>
     </div>
 
+    <br>
+    <br>
+
     <hr>
         <h3 class="myHeaders" id="query4">Query 4</h3>
     <hr>
@@ -430,7 +436,8 @@
         </select>
     </div>
 
-        <h10 id="textForShapeCounts">Please choose a shape</h10>
+    <h10 id="textForShapeCounts">Please choose a shape</h10>
+    <br>
     <div class="form-popup" id="shapeCountsForm">
         <form action="" class="form-container" id='shapeCountsForm'>
             
@@ -447,6 +454,8 @@
         </form>
     </div>
 
+    <br>
+    <br>
 
     <hr>
         <h3 class="myHeaders" id="query5">Query 5</h3>
@@ -461,6 +470,44 @@
             <input type='submit' value="Display Downloads" class="btn btn-secondary"></input>
             <input type='reset' value="Sort by Name" id="sortDownloadsByName" class="btn btn-secondary"></input>
             <input type='reset' value="Sort by Count" id="sortByCount" class="btn btn-secondary"></input>
+
+        </form>
+    </div>
+
+    <br>
+    <br>
+
+    <hr>
+        <h3 class="myHeaders" id="query6">Query 6</h3>
+    <hr> 
+    
+    <div class="dropdown">
+        <button id="changesListNamesBttn" class="dropbtn">Choose File Name</button>
+        <select id="changesListNames" class="dropdown-content">
+            <option value="None">-- Select --</option>            
+        </select>
+    </div>
+    <div class="dropdown">
+        <button id="changesTypeBttn" class="dropbtn">Choose Change Type</button>
+        <select id="changesType" class="dropdown-content">
+            <option value="None">-- Select --</option>            
+        </select>
+    </div>
+    <br>
+
+    <h10 id="textForChangesDropDown">Hint: Please click drop down buttons first to populate them!</h10>
+
+    <br>
+    <br>
+    <div class="form-popup" id="changesForm">
+        <form action="" class="form-container" id='changesForm'>            
+            
+            <label class="addShape" for="startDate"><b>Start Date:</b></label>
+            <input class="addShape" type="number" id="startDate" placeholder="YYYY-MM-DD hh:mm:ss" name="startDate" min="0" required>
+            <label class="addShape" for="endDate"><b>End Date:</b></label>
+            <input class="addShape" type="number" id="endDate" placeholder="YYYY-MM-DD hh:mm:ss" name="endDate" min="0" required>
+            <br>
+            <input type='submit' value="Run" id="displayChanges" class="btn btn-secondary"></input>
 
         </form>
     </div>

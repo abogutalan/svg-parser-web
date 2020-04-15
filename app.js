@@ -1423,6 +1423,112 @@ app.get('/shapeCounts', function(req, res){
 
 });
 
+/* Query 5 */
+app.get('/queryDisplayDownloadsFiles', function(req, res) {
+
+  let N_number = req.query.N_number;
+
+  let fileQuery = " SELECT a.file_name, b.d_descr, COUNT(b.svg_id) as count, b.svg_id \
+   FROM FILE a INNER JOIN DOWNLOAD b WHERE (a.svg_id = b.svg_id) GROUP BY svg_id ORDER BY count DESC LIMIT " + N_number;   
+  
+  let file_name, summary, count;
+
+  async function main() {
+    // get the client
+    const mysql = require('mysql2/promise');
+
+    let connection;
+    
+    try{
+        // create the connection
+        connection = await mysql.createConnection(dbConnection);
+        //Populate the table
+        const [files] = await connection.execute(fileQuery);
+        
+        let stack = [];
+        for (var i in files) {
+          file_name = files[i].file_name;
+          summary = files[i].d_descr;
+          count = files[i].count;
+
+        var myJson = {
+          file_name: file_name,
+            summary: summary,
+            count: count
+        };  
+         
+        stack.push(myJson);
+      }
+  
+    res.send(stack);
+
+    }catch(e){
+        console.log("Query error: "+e);
+    }finally {
+        if (connection && connection.end) connection.end();
+    }    
+  }
+  main();
+  
+});
+
+app.get('/querySortDownloadsByName', function(req, res) {
+
+  let N_number = req.query.N_number;
+
+  let fileQuery = " SELECT a.file_name, b.d_descr, COUNT(b.svg_id) as count, b.svg_id \
+   FROM FILE a INNER JOIN DOWNLOAD b WHERE (a.svg_id = b.svg_id) GROUP BY svg_id ORDER BY count DESC LIMIT " + N_number;
+   
+  let sortByNameQuery = " SELECT a.file_name, b.d_descr, COUNT(b.svg_id) as count, b.svg_id \
+   FROM FILE a INNER JOIN DOWNLOAD b WHERE (a.svg_id = b.svg_id) GROUP BY svg_id ORDER BY file_name";
+  
+  let file_name = "", summary = "", count = 0, svg_id = "";
+  let svg_id_list = "";
+
+  async function main() {
+    // get the client
+    const mysql = require('mysql2/promise');
+
+    let connection;
+    
+    try{
+        // create the connection
+        connection = await mysql.createConnection(dbConnection);
+        //Populate the table
+        const [files] = await connection.execute(fileQuery);
+        const [sortedFiles] = await connection.execute(sortByNameQuery);
+        
+        let stack = [];
+        for (var i in files)
+          svg_id_list = svg_id_list + files[i].svg_id + " ";
+        
+        for (var i in sortedFiles) {
+
+          file_name = sortedFiles[i].file_name;
+          summary = sortedFiles[i].d_descr;
+          count = sortedFiles[i].count;
+          svg_id = sortedFiles[i].svg_id;
+
+        var myJson = {
+          file_name: file_name,
+            summary: summary,
+            count: count
+        };  
+        if(svg_id_list.includes(svg_id))
+        stack.push(myJson);
+      }
+      //console.log("list: "+ svg_id_list);
+    res.send(stack);
+
+    }catch(e){
+        console.log("Query error: "+e);
+    }finally {
+        if (connection && connection.end) connection.end();
+    }    
+  }
+  main();  
+});
+
 let dbConf = {
 	host     : 'dursley.socs.uoguelph.ca',
 	user     : 'aogutala',

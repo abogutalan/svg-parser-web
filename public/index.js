@@ -913,7 +913,7 @@ $(document).ready(function() {
 
     $('#logInForm').submit(function(e){
 
-        console.log("Logging In!");
+        console.log("Logged In!");
         e.preventDefault();
 
         $.ajax({
@@ -1586,6 +1586,94 @@ function populateShapeCountsTable(data, table) {
     }
 }
 
+/* ************ Query 5 ************ */
+
+function populateExecuteDownloadsTable(myURL){
+    let N_num = $('#n_value').val();
+
+    if ( N_num == "") alert("Please enter N value!");
+    else{
+    
+    $.ajax({
+        type: 'get',
+        dataType: 'json',
+        url: myURL,
+        data: {
+            file_name: "",
+            summary: "",
+            count: "0",
+            N_number: N_num
+        },
+        success: function(data) { 
+
+            /* Creating Query Table */
+            var table=document.getElementById("queryTable");
+            table.innerHTML = "";            
+            
+            create_N_FrequentlyDownloadedTable(table);
+
+        for(let k = 0; k < data.length; k++){     
+            
+            let len = table.rows.length;
+            var row = table.insertRow(len);
+    
+            /* filling Execute Query Table in */
+            for (let i = 0; i <= 8; i++) {
+                if(i == 0) {
+                    let cell0 = row.insertCell(0);
+                    cell0.innerHTML=data[k].file_name;
+                }
+                else if(i == 1) {
+                    let cell1 = row.insertCell(1);
+                    cell1.innerHTML=data[k].summary;
+                    
+                }
+                else if(i == 2) {
+                    let cell2 = row.insertCell(2);
+                    cell2.innerHTML=data[k].count;
+                }
+                
+            }
+        }
+    
+        },
+        fail: function (error) {
+            console.log("queryDisplayFiles Error!");
+            console.log(error);
+        }
+    });
+}
+}
+
+/* EXECUTE Download TABLE */
+$('#frequentlyDownloadsForm').submit(function(e){
+
+    console.log("Displaying most frequently downlaod files!");
+    e.preventDefault();
+    myURL = '/queryDisplayDownloadsFiles';
+    populateExecuteDownloadsTable(myURL);
+    
+}); 
+/* SORTING Download TABLE by NAME */
+$('#sortDownloadsByName').click(function(e){
+
+    console.log("Sorting by Name!");
+    e.preventDefault();
+    myURL = '/querySortDownloadsByName';
+    populateExecuteDownloadsTable(myURL);
+    
+}); 
+/* SORTING Download TABLE by Count */
+$('#sortByCount').click(function(e){
+
+    console.log("Sorting by Count!");
+    e.preventDefault();
+    myURL = '/queryDisplayDownloadsFiles';
+    populateExecuteDownloadsTable(myURL);
+    
+}); 
+
+
 function createQueryTable(table) {
     let tableHead = table.createTHead();
             
@@ -1735,6 +1823,39 @@ function createShapeCountsTable(table) {
     firstRow.appendChild(creation_time);
     firstRow.appendChild(file_size);
     firstRow.appendChild(shape_counts);
+
+    /* Setting rows to the table head */
+    tableHead.appendChild(firstRow);
+            
+    /* Appending to the panel */
+    table.appendChild(tableHead);
+}
+
+function create_N_FrequentlyDownloadedTable(table) {
+    let tableHead = table.createTHead();
+            
+    /* Creating rows of the panel. */
+    let firstRow = document.createElement('tr');
+
+    /* Creating section names of the table */
+    let file_name = document.createElement('th');            
+    let num_of_changes = document.createElement('th');
+    let most_recent_modification_date = document.createElement('th');
+
+    /* Creating text of sections */            
+    let firstColumn = document.createTextNode('file_name');
+    let secondColumn = document.createTextNode('summary');
+    let thirdColumn = document.createTextNode('download_counts');
+
+    /* setting section names */
+    file_name.appendChild(firstColumn);            
+    num_of_changes.appendChild(secondColumn);
+    most_recent_modification_date.appendChild(thirdColumn);
+
+    /* Setting sections to rows */
+    firstRow.appendChild(file_name);
+    firstRow.appendChild(num_of_changes);
+    firstRow.appendChild(most_recent_modification_date);
 
     /* Setting rows to the table head */
     tableHead.appendChild(firstRow);

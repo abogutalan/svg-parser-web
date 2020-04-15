@@ -895,8 +895,8 @@ $(document).ready(function() {
 
 
     // A4 codes
-
     $('#logInForm').submit(function(e){
+        
 
         console.log("Logged In!");
         e.preventDefault();
@@ -911,15 +911,20 @@ $(document).ready(function() {
                 dbName: $('#dbNameBox').val()    
             },
             success: function (data) {
-                console.log(data);
+                console.log(data.retVal);
+                let retVal = data.retVal;
+                if(retVal == "FAILS") {
+                    alert("Please enter valid datbase credentials!");
+                    location.reload(true);
+                }
             },
             fail: function(error) {
-                console.log("Error while logging in!");
+                console.log("Error  logging in!");
                 console.log(error);
             }
         });
-    });
 
+    });
     // inserting all files displayed in the File Log Panel into the database
     $('#storeFiles').click(function(e){
 

@@ -861,6 +861,7 @@ let dbConnection;
 
 app.post('/db_logIn', function(req, res) {
   var output = {};
+  var retVal = "SUCCESS";
   
   req.on('data', function(data) {
     data = data.toString();
@@ -923,8 +924,16 @@ app.post('/db_logIn', function(req, res) {
             await connection.execute(downloadQuery);
     
         }catch(e){
-            console.log("Query error: "+e);
-            console.log("Error while logging in! ");
+
+            console.log("Please enter valid database credentials! ");
+
+             var myJson = {
+              retVal: retVal    
+             };  
+           
+            res.send(myJson);
+
+            
         }finally {
             if (connection && connection.end) connection.end();
         }        
@@ -933,10 +942,7 @@ app.post('/db_logIn', function(req, res) {
 
   })
   
-  // console.log(output); //empty 
-  
-  res.redirect('/');
-
+   
 });
 
 function getFileSize(path){

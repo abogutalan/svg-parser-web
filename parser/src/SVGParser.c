@@ -93,7 +93,7 @@ char* getUnit(char* value){
     for(i=0;i<size;i++)
     {
 		if( isdigit(value[i]) ) {
-			number = value[i] - '7';
+			number = value[i];
 		}
 		if( number == 0 ) { 
             if ( (value[i] != '-') && (value[i] != '.')){

@@ -103,7 +103,6 @@ let sharedLib = ffi.Library('./libsvgparse', {
 /* file log table */
 app.get('/uploadedFiles', function(req, res) {
 
-
   var myStack = [];
   let path;
   var fs = require('fs');
@@ -744,7 +743,8 @@ function trackChanges_ScaleRect(filename, scaleFactor, filesize){
   var date = new Date().toISOString().slice(0, 19).replace('T', ' ');
 
     let query = "INSERT INTO IMG_CHANGE (change_type, change_summary, change_time, svg_id)\
-     VALUES ('"+ changeType + "', '"+ description + "', '" + date + "', (SELECT svg_id FROM FILE WHERE file_name='"+ filename + "'))";
+     VALUES ('"+ changeType + "', '"+ description + "', '" + date + "', (SELECT svg_id FROM FILE \
+      WHERE (file_name='"+ filename + "') AND (n_rect > 0)))";
     
      let updateFileSize = "UPDATE FILE SET file_size="+filesize+" WHERE FILE.file_name = '"+filename+"'";
 
@@ -813,7 +813,8 @@ function trackChanges_ScaleCircle(filename, scaleFactor, filesize){
   var date = new Date().toISOString().slice(0, 19).replace('T', ' ');
 
     let query = "INSERT INTO IMG_CHANGE (change_type, change_summary, change_time, svg_id)\
-     VALUES ('"+ changeType + "', '"+ description + "', '" + date + "', (SELECT svg_id FROM FILE WHERE file_name='"+ filename + "'))";
+     VALUES ('"+ changeType + "', '"+ description + "', '" + date + "', (SELECT svg_id FROM FILE WHERE \
+      (file_name='"+ filename + "') AND (n_circ > 0)))";
 
     let updateFileSize = "UPDATE FILE SET file_size="+filesize+" WHERE FILE.file_name = '"+filename+"'";
 
@@ -926,23 +927,26 @@ app.post('/db_logIn', function(req, res) {
         }catch(e){
 
             console.log("Please enter valid database credentials! ");
-
-             var myJson = {
-              retVal: retVal    
-             };  
-           
-            res.send(myJson);
+            
+            retVal = "FAILS";
+             
 
             
         }finally {
             if (connection && connection.end) connection.end();
+            //console.log("final ret: "+ retVal);
+            var myJson = {
+              retVal: retVal    
+             };  
+           
+            res.send(myJson);
         }        
       }    
     main();
 
   })
   
-   
+  //res.redirect('/');
 });
 
 function getFileSize(path){

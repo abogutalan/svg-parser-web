@@ -21,14 +21,14 @@ $(document).ready(function() {
                 so we do not need to parse it on the server.
                 JavaScript really does handle JSONs seamlessly
             */
-            $('#blah').html("On page load, received string '"+data.foo+"' from server");
+            //$('#blah').html("On page load, received string '"+data.foo+"' from server");
             //We write the object to the console to show that the request was successful
-            console.log(data); 
+            //console.log(data); 
 
         },
         fail: function(error) {
             // Non-200 return, do something with error
-            $('#blah').html("On page load, received error from server");
+            //$('#blah').html("On page load, received error from server");
             console.log(error); 
         }
     });
@@ -164,7 +164,8 @@ $(document).ready(function() {
             /* drop down for scaling Shape */ 
             var scaleShapeDropDown = document.getElementById("scaleShape");
 
-
+        if($('#usernameBox').val() != "")
+        
             for (var i in data) {
                 let option = document.createElement("option");
                 option.value = data[i].fileName;
@@ -195,7 +196,7 @@ $(document).ready(function() {
                 option.text = data[i].fileName;
                 scaleShapeDropDown.add(option);
             }
-
+        
 
             document.getElementById('mySelect').addEventListener('change', update, true);
             let curVal;
@@ -626,6 +627,8 @@ $(document).ready(function() {
     }
 
     $('#editAttrVal').submit(function(e){
+        if($('#usernameBox').val() == "") alert("Please connect to the database first!")
+        else{
         $('#editName').html("Edit Attr name: "+$('#nameBox').val());
         $('#editValue').html("Edit Attr value: "+$('#valueBox').val());
         console.log("Edit Attribute button clicked!");
@@ -652,7 +655,7 @@ $(document).ready(function() {
             
         });
         location.reload(true);
-
+    }
     });
 
 
@@ -670,7 +673,8 @@ $(document).ready(function() {
     }
 
     $('#editTitleDescForm').submit(function(e){      
-
+        if($('#usernameBox').val() == "") alert("Please connect to the database first!")
+        else{
         console.log("Editing Title and Desc of "+globalCurVal); 
         e.preventDefault();
         $.ajax({
@@ -693,10 +697,12 @@ $(document).ready(function() {
             
         });
         location.reload(true);
+    }
     });
 
     $('#newSVGForm').submit(function(e){
-        
+        if($('#usernameBox').val() == "") alert("Please connect to the database first!")
+        else{
         console.log("Create SVG button clicked!");
         e.preventDefault();
         //Pass data to the Ajax call, so it gets passed to the server
@@ -720,7 +726,7 @@ $(document).ready(function() {
         });
         
         location.reload(true); 
-        
+    }
     });
 
 
@@ -737,7 +743,9 @@ $(document).ready(function() {
         
     }
 
-    $('#shapeFormRect').submit(function(e){      
+    $('#shapeFormRect').submit(function(e){  
+        if($('#usernameBox').val() == "") alert("Please connect to the database first!")
+        else{    
         console.log("add Rect button clicked!");
 
         let val_X = $('#rectX').val();
@@ -766,9 +774,12 @@ $(document).ready(function() {
             
         });
         location.reload(true);
+    }
     });
 
-    $('#shapeFormCircle').submit(function(e){      
+    $('#shapeFormCircle').submit(function(e){   
+        if($('#usernameBox').val() == "") alert("Please connect to the database first!")
+        else{   
         console.log("add Circle button clicked!");
 
         let val_X = $('#circleX').val();
@@ -796,9 +807,12 @@ $(document).ready(function() {
             
         });
         location.reload(true);
+    }
     });
 
-    $('#shapeFormPath').submit(function(e){      
+    $('#shapeFormPath').submit(function(e){   
+        if($('#usernameBox').val() == "") alert("Please connect to the database first!")
+        else{   
         console.log("add Path button clicked!");
                 
         e.preventDefault();
@@ -821,6 +835,7 @@ $(document).ready(function() {
             
         });
         location.reload(true);
+    }
     });
 
 
@@ -839,7 +854,9 @@ $(document).ready(function() {
         
     }
 
-    $('#scaleRectForm').submit(function(e){      
+    $('#scaleRectForm').submit(function(e){   
+        if($('#usernameBox').val() == "") alert("Please connect to the database first!")
+        else{    
         console.log("shape Rect button clicked!");
                 
         e.preventDefault();
@@ -863,9 +880,12 @@ $(document).ready(function() {
             
         });
         // location.reload(true);
+    }
     });
 
-    $('#scaleCircleForm').submit(function(e){      
+    $('#scaleCircleForm').submit(function(e){  
+        if($('#usernameBox').val() == "") alert("Please connect to the database first!")
+        else{    
         console.log("shape Circle button clicked!");
                 
         e.preventDefault();
@@ -889,6 +909,7 @@ $(document).ready(function() {
             
         });
         // location.reload(true);
+    }
     });
 
 
@@ -897,8 +918,6 @@ $(document).ready(function() {
     // A4 codes
     $('#logInForm').submit(function(e){
         
-
-        console.log("Logged In!");
         e.preventDefault();
 
         $.ajax({
@@ -911,12 +930,17 @@ $(document).ready(function() {
                 dbName: $('#dbNameBox').val()    
             },
             success: function (data) {
-                console.log(data.retVal);
+
                 let retVal = data.retVal;
                 if(retVal == "FAILS") {
                     alert("Please enter valid datbase credentials!");
                     location.reload(true);
                 }
+                else if(retVal == "SUCCESS") {
+                    console.log("Connected to the database!");
+                    document.getElementById("upload-button").disabled = false;
+                    document.getElementById("submitUploadFile").disabled = false;
+                } 
             },
             fail: function(error) {
                 console.log("Error  logging in!");
@@ -927,19 +951,22 @@ $(document).ready(function() {
     });
     // inserting all files displayed in the File Log Panel into the database
     $('#storeFiles').click(function(e){
-
+        if($('#usernameBox').val() == "") alert("Please connect to the database first!")
+        else{
         console.log("Storing all Files from uploads directory!");
 
         e.preventDefault();
         
-        passAllSVGfilesToDatabase();       
+        passAllSVGfilesToDatabase();   
+        }    
     });
 
     function passAllSVGfilesToDatabase() {
         var files = document.getElementById('mySelect');
-        console.log("len: "+ files.length);
+        console.log("files len: "+ (files.length - +1));
+        // bigger than 2 because first element is 'select item';
         if(files.length < 2) alert("No files in File Log!");
-   
+        else{
         for(var i = 1; i < files.length; i++) {
             
             $.ajax({
@@ -959,9 +986,11 @@ $(document).ready(function() {
             });
         }
     }
+    }
 
     $('#clearFiles').click(function(e){
-
+        if($('#usernameBox').val() == "") alert("Please connect to the database first!")
+        else{
         console.log("Clearing all data!");
         e.preventDefault();
 
@@ -980,10 +1009,12 @@ $(document).ready(function() {
                 console.log(error);
             }
         });
+    }
     });
 
     $('#displayStatus').click(function(e){
-
+        if($('#usernameBox').val() == "") alert("Please connect to the database first!")
+        else{
         console.log("Displaying all data!");
         e.preventDefault();
 
@@ -1005,6 +1036,7 @@ $(document).ready(function() {
                 console.log(error);
             }
         });
+    }
     });  
 
     // inserting a record into the DOWNLOAD table
@@ -1121,30 +1153,33 @@ function populateExecuteQueryTable(myURL, string){
 
 /* EXECUTE QUERY TABLE */
 $('#displayFiles').click(function(e){
-
+    if($('#usernameBox').val() == "") alert("Please connect to the database first!")
+    else{
     console.log("Displaying all files on Query Table!");
     e.preventDefault();
     myURL = '/queryDisplayFiles';
     populateExecuteQueryTable(myURL, "");
-    
+    }
 }); 
 /* SORTING QUERY TABLE by NAME */
 $('#sortByName').click(function(e){
-
+    if($('#usernameBox').val() == "") alert("Please connect to the database first!")
+    else{
     console.log("Sorting by Name!");
     e.preventDefault();
     myURL = '/querySortByName';
     populateExecuteQueryTable(myURL, "");
-    
+    }
 }); 
 /* SORTING QUERY TABLE by SIZE */
 $('#sortBySize').click(function(e){
-
+    if($('#usernameBox').val() == "") alert("Please connect to the database first!")
+    else{
     console.log("Sorting by Size!");
     e.preventDefault();
     myURL = '/querySortBySize';
     populateExecuteQueryTable(myURL, "");
-    
+    }
 }); 
 
 /* ************ Query 2 ************ */
@@ -1155,7 +1190,8 @@ $('#currentTime').html("Current Time: " + date);
 
 /* display files between spesific dates */
 $('#displayBetweenDates').click(function(e){
-
+    if($('#usernameBox').val() == "") alert("Please connect to the database first!")
+    else{
     console.log("Displaying between spesific dates!");
     let firstDate = $('#firstDateBox').val();
     let secondDate = $('#secondDateBox').val();
@@ -1170,10 +1206,12 @@ $('#displayBetweenDates').click(function(e){
         alert("End Date format must be YYYY-MM-DD hh:mm:ss");
     } 
     else populateExecuteQueryTable(myURL, dates);    
+}
 });
 /* display files by name */
 $('#displayByName').click(function(e){
-
+    if($('#usernameBox').val() == "") alert("Please connect to the database first!")
+    else{
     console.log("Displaying by names!");
     let firstDate = $('#firstDateBox').val();
     let secondDate = $('#secondDateBox').val();
@@ -1187,11 +1225,13 @@ $('#displayByName').click(function(e){
     else if (isDateValid(secondDate) == 0) {
         alert("End Date format must be YYYY-MM-DD hh:mm:ss");
     } 
-    else populateExecuteQueryTable(myURL, dates);    
+    else populateExecuteQueryTable(myURL, dates);   
+} 
 });
 /* display files by size */
 $('#displayBySize').click(function(e){
-
+    if($('#usernameBox').val() == "") alert("Please connect to the database first!")
+    else{
     console.log("Displaying by size!");
     let firstDate = $('#firstDateBox').val();
     let secondDate = $('#secondDateBox').val();
@@ -1206,11 +1246,12 @@ $('#displayBySize').click(function(e){
         alert("End Date format must be YYYY-MM-DD hh:mm:ss");
     } 
     else populateExecuteQueryTable(myURL, dates);
-    
+}
 }); 
 /* display files by creation date */
 $('#displayByCreationDate').click(function(e){
-
+    if($('#usernameBox').val() == "") alert("Please connect to the database first!")
+    else{
     console.log("Displaying by date!");
     let firstDate = $('#firstDateBox').val();
     let secondDate = $('#secondDateBox').val();
@@ -1225,7 +1266,7 @@ $('#displayByCreationDate').click(function(e){
         alert("End Date format must be YYYY-MM-DD hh:mm:ss");
     } 
     else populateExecuteQueryTable(myURL, dates);
-    
+}
 }); 
 
 /* ************ Query 3 ************ */
@@ -1297,7 +1338,8 @@ function populateModifiedFilesTable(myURL, dates, sortType){
 
 /* display files between spesific dates */
 $('#displayBetweenModifiedDates').click(function(e){
-
+    if($('#usernameBox').val() == "") alert("Please connect to the database first!")
+    else{
     console.log("Displaying between modified dates!");
     let firstDate = $('#modifiedStartDate').val();
     let secondDate = $('#modifiedEndDate').val();
@@ -1312,11 +1354,13 @@ $('#displayBetweenModifiedDates').click(function(e){
     else if (isDateValid(secondDate) == 0) {
         alert("End Date format must be YYYY-MM-DD hh:mm:ss");
     } 
-    else populateModifiedFilesTable(myURL, dates);    
+    else populateModifiedFilesTable(myURL, dates);   
+} 
 });
 /* display files by NAME */
 $('#displayByModifiedName').click(function(e){
-
+    if($('#usernameBox').val() == "") alert("Please connect to the database first!")
+    else{
     console.log("Displaying by modified names!");
     let firstDate = $('#modifiedStartDate').val();
     let secondDate = $('#modifiedEndDate').val();
@@ -1330,11 +1374,13 @@ $('#displayByModifiedName').click(function(e){
     else if (isDateValid(secondDate) == 0) {
         alert("End Date format must be YYYY-MM-DD hh:mm:ss");
     } 
-    else populateModifiedFilesTable(myURL, dates, "sortByName");    
+    else populateModifiedFilesTable(myURL, dates, "sortByName");   
+} 
 });
 /* display files by SIZE */
 $('#displayByModifiedSize').click(function(e){
-
+    if($('#usernameBox').val() == "") alert("Please connect to the database first!")
+    else{
     console.log("Displaying by modified size!");
     let firstDate = $('#modifiedStartDate').val();
     let secondDate = $('#modifiedEndDate').val();
@@ -1349,11 +1395,12 @@ $('#displayByModifiedSize').click(function(e){
         alert("End Date format must be YYYY-MM-DD hh:mm:ss");
     } 
     else populateModifiedFilesTable(myURL, dates, "sortBySize");
-    
+}
 }); 
 /* display files by MOST RECENT date */
 $('#displayByMostRecentDate').click(function(e){
-
+    if($('#usernameBox').val() == "") alert("Please connect to the database first!")
+    else{
     console.log("Displaying by most recent date!");
     let firstDate = $('#modifiedStartDate').val();
     let secondDate = $('#modifiedEndDate').val();
@@ -1368,7 +1415,7 @@ $('#displayByMostRecentDate').click(function(e){
         alert("End Date format must be YYYY-MM-DD hh:mm:ss");
     } 
     else populateModifiedFilesTable(myURL, dates, "sortByDate");
-    
+}
 }); 
 
 /* ************ Query 4 ************ */
@@ -1383,7 +1430,9 @@ var selected_item = "";
         shape_bttn.innerHTML = selected_item;
         
     }
-$('#shapeCountsForm').submit(function(e){      
+$('#shapeCountsForm').submit(function(e){ 
+    if($('#usernameBox').val() == "") alert("Please connect to the database first!")
+    else{     
     console.log("Displaying files with shape counts in range!");
     if((selected_item == "") || (selected_item == "None")) alert("Please spesify the shape!");
             
@@ -1427,9 +1476,12 @@ $('#shapeCountsForm').submit(function(e){
         }
         
     });
+}
 });
 
 $('#shapeCountSortByName').click(function(e){      
+    if($('#usernameBox').val() == "") alert("Please connect to the database first!")
+    else{
     console.log("Displaying files with shape counts in range!");
     let firstRange = $('#firstRange').val();
     let secondRange = $('#secondRange').val();
@@ -1473,10 +1525,13 @@ $('#shapeCountSortByName').click(function(e){
         }
         
     });
+    }
 }
 });
 
-$('#shapeCountSortBySize').click(function(e){      
+$('#shapeCountSortBySize').click(function(e){   
+    if($('#usernameBox').val() == "") alert("Please connect to the database first!")
+    else{   
     console.log("Displaying files with shape counts in range!");
     let firstRange = $('#firstRange').val();
     let secondRange = $('#secondRange').val();
@@ -1521,9 +1576,12 @@ $('#shapeCountSortBySize').click(function(e){
         
     });
 }
+    }
 });
 
-$('#sortByShapeCount').click(function(e){      
+$('#sortByShapeCount').click(function(e){   
+    if($('#usernameBox').val() == "") alert("Please connect to the database first!")
+    else{   
     console.log("Displaying files with shape counts in range!");
     let firstRange = $('#firstRange').val();
     let secondRange = $('#secondRange').val();
@@ -1568,6 +1626,7 @@ $('#sortByShapeCount').click(function(e){
         
     });
 }
+    }
 });
 
 function populateShapeCountsTable(data, table) {
@@ -1685,30 +1744,33 @@ function populateExecuteDownloadsTable(myURL){
 
 /* EXECUTE Download TABLE */
 $('#frequentlyDownloadsForm').submit(function(e){
-
+    if($('#usernameBox').val() == "") alert("Please connect to the database first!")
+    else{
     console.log("Displaying most frequently downlaod files!");
     e.preventDefault();
     myURL = '/queryDisplayDownloadsFiles';
     populateExecuteDownloadsTable(myURL);
-    
+    }
 }); 
 /* SORTING Download TABLE by NAME */
 $('#sortDownloadsByName').click(function(e){
-
+    if($('#usernameBox').val() == "") alert("Please connect to the database first!")
+    else{
     console.log("Sorting by Name!");
     e.preventDefault();
     myURL = '/querySortDownloadsByName';
     populateExecuteDownloadsTable(myURL);
-    
+    }
 }); 
 /* SORTING Download TABLE by Count */
 $('#sortByCount').click(function(e){
-
+    if($('#usernameBox').val() == "") alert("Please connect to the database first!")
+    else{
     console.log("Sorting by Count!");
     e.preventDefault();
     myURL = '/queryDisplayDownloadsFiles';
     populateExecuteDownloadsTable(myURL);
-    
+    }
 }); 
 
 /* ************ Query 5 ************ */
@@ -1735,7 +1797,8 @@ changeTypeDropDown.addEventListener('change', changeTypeUpdate, true);
 
 
 $('#changesForm').submit(function(e){
-
+    if($('#usernameBox').val() == "") alert("Please connect to the database first!")
+    else{
     console.log("Displaying all changes of a specific type to a specific file between specific dates!");
     e.preventDefault();
 
@@ -1755,7 +1818,7 @@ $('#changesForm').submit(function(e){
         alert("Please select a command via Radio Button!");
     } 
     else queryDisplayChanges(startDate, endDate, command);
-    
+}
     
 }); 
 
@@ -1817,6 +1880,8 @@ function queryDisplayChanges(startDate, endDate, command){
 }
 
 $('#changesListNamesBttn').click(function(e){
+    if($('#usernameBox').val() == "") alert("Please connect to the database first!")
+        else{
     e.preventDefault();
     $.ajax({
 
@@ -1844,9 +1909,12 @@ $('#changesListNamesBttn').click(function(e){
         }
         
     });
+}
 });
 
 $('#changesTypeBttn').click(function(e){
+    if($('#usernameBox').val() == "") alert("Please connect to the database first!")
+    else{
     e.preventDefault();
 
     if ( selected_file_name == "") alert("Please select a file name first!");
@@ -1879,6 +1947,7 @@ $('#changesTypeBttn').click(function(e){
         
     });
 }
+    }
 });
 
     
